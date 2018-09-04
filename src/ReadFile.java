@@ -19,7 +19,7 @@ public class ReadFile {
 
         try {
             //create variables
-            File file = new File("C:\\Users\\jack1\\IdeaProjects\\untitled\\src\\config_file.txt");
+            File file = new File("src/config_file.txt");
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             StringBuffer stringBuffer = new StringBuffer();
