@@ -14,8 +14,8 @@ public class ReadFile {
         int portNumber;
         ArrayList <Integer> nodalConnections = new ArrayList<Integer>();
     }
-    
-    public static void main(String[] args) {
+
+    public static void parser() {
         try {
             //create variables
             File file = new File("src/config_file.txt");
@@ -75,7 +75,6 @@ public class ReadFile {
                     while (line != null) {
                         //parse info
                         int next;
-                        System.out.println("1" + line);
                         if (!(line.indexOf(" ") == -1)) {
                             next = line.indexOf(" ");
                             array_of_nodes[nodeId].nodalConnections.add(Integer.parseInt(line.substring(0, next)));
@@ -89,11 +88,12 @@ public class ReadFile {
                     valid_lines++;
                 }
             }
-            for (int i = 0; i < numNode; i++) {
-                System.out.println(array_of_nodes[i].nodalConnections);
-            }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    
+    public static void main(String[] args) {
+        parser();
     }
 }
