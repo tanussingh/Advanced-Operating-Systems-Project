@@ -10,13 +10,13 @@ public class Main {
         Nodes[] array_of_nodes = Parser.parse("src/config_file.txt");
 
         //figure out which machine this is
-        int thisServer = 0;
+        int source = 0;
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 0; i < array_of_nodes.length; i++) {
                 thisHostName = "dc02.utdallas.edu";
                 if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
-                    thisServer = i;
+                    source = i;
                 }
             }
         } catch (IOException e) {
@@ -24,8 +24,14 @@ public class Main {
         }
 
         //create server
-        Server server = new Server(array_of_nodes[thisServer]);
-        //create client
-        //client(array_of_nodes);
+        Server server = new Server(array_of_nodes[source]);
+
+        //spawn threads for multiple client
+        for (int i = 0; i < array_of_nodes[i].getNodalConnections().size(); i++)
+        {
+            Client client = new Client(array_of_nodes[i]);
+            client.start();
+        }
+
     }
 }
