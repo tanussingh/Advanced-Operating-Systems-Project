@@ -1,13 +1,12 @@
 // Members: Helee Thumber (hat170030), Tanushri Singh (tts15030), Ko-Chen (Jack) Chen (kxc170002)
 
-import java.io.File;
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class ReadFile {
-
+    
     public static class Nodes {
         int nodeID;
         String hostName;
@@ -15,26 +14,43 @@ public class ReadFile {
         ArrayList <Integer> nodalConnections = new ArrayList<Integer>();
     }
 
-    public static void parser() {
+    public static Nodes[] parser() {
+        //get number of nodes
+        int numNode = 0;
         try {
-            //create variables
+            //open file
             File file = new File("src/config_file.txt");
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
-            StringBuffer stringBuffer = new StringBuffer();
+            numNode = Integer.parseInt(bufferedReader.readLine());
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        //build the array of nodes
+        Nodes[] array_of_nodes = new Nodes[numNode];
+
+        try {
+            //open file
+            File file = new File("src/config_file.txt");
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            //StringBuffer stringBuffer = new StringBuffer();
             String line;
-            int numNode;
+            //int numNode;
             boolean empty = false;
             int valid_lines = 0;
 
             //read in number of nodes
-            numNode = Integer.parseInt(bufferedReader.readLine());
+            //numNode = Integer.parseInt(bufferedReader.readLine());
             //create array to hold pointers to nodes
-            Nodes [] array_of_nodes = new Nodes[numNode];
+            //Nodes [] array_of_nodes = new Nodes[numNode];
 
             //node info
+            line = bufferedReader.readLine();
             while (valid_lines != numNode) {
-                line = bufferedReader.readLine();
+                line = bufferedReader.readLine();                
                 empty = false;
                 //format each line to correct format
                 if (line.contains("#")) {
@@ -88,12 +104,54 @@ public class ReadFile {
                     valid_lines++;
                 }
             }
+            bufferedReader.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return array_of_nodes;
+    }
+
+    public static void server(Nodes[] array_of_nodes) {
+        //figure out which machine this is
+        int numNode = array_of_nodes.length;
+        int thisServer = 0;
+        try {
+            String thisHostName = InetAddress.getLocalHost().getHostName();
+            for (int i = 0; i < numNode; i++) {
+                thisHostName = "dc02.utdallas.edu";
+                if (Objects.equals(thisHostName, array_of_nodes[i].hostName)){
+                    thisServer = i;
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void client(Nodes[] array_of_nodes) {
+        //figure out which machine this is
+        int numNode = array_of_nodes.length;
+        int thisServer = 0;
+        try {
+            String thisHostName = InetAddress.getLocalHost().getHostName();
+            for (int i = 0; i < numNode; i++) {
+                thisHostName = "dc02.utdallas.edu";
+                if (Objects.equals(thisHostName, array_of_nodes[i].hostName)){
+                    thisServer = i;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
     
     public static void main(String[] args) {
-        parser();
+        //parse config file
+        Nodes[] array_of_nodes = parser();
+        //create server
+        server(array_of_nodes);
+        //create client
+        client(array_of_nodes);
     }
 }
