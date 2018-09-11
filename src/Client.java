@@ -1,8 +1,5 @@
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.io.*;
+import java.net.*;
 
 public class Client extends Thread
 {
@@ -14,6 +11,19 @@ public class Client extends Thread
     // constructor to put ip address and port
     public Client(Nodes node)
     {
+        try
+        {
+            // Displaying the thread that is running
+            System.out.println ("Thread " +
+                    Thread.currentThread().getId() +
+                    " is running");
+
+        }
+        catch (Exception e)
+        {
+            // Throwing an exception
+            System.out.println ("Exception is caught");
+        }
         String address = node.getHostName();
         int port = node.getPortNumber();
         // establish a connection

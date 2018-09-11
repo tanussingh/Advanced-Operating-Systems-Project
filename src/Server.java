@@ -4,14 +4,37 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server {
+public class Server extends Thread{
     //initialize socket and input stream
     private Socket socket = null;
     private ServerSocket server = null;
     private DataInputStream in = null;
+    private Thread t;
+
+    public void start() {
+        System.out.println("YAY SERVER STARTED MAYBE");
+        if (t == null) {
+            t = new Thread (this);
+            t.start ();
+        }
+    }
+
 
     // constructor with port
     public Server(Nodes node) {
+        try
+        {
+            // Displaying the thread that is running
+            System.out.println ("Thread " +
+                    Thread.currentThread().getId() +
+                    " is running");
+
+        }
+        catch (Exception e)
+        {
+            // Throwing an exception
+            System.out.println ("Exception is caught");
+        }
         int port = node.getPortNumber();
         // starts server and waits for a connection
         try {
