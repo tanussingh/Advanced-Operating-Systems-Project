@@ -11,8 +11,8 @@ public class Server {
     private DataInputStream in = null;
 
     // constructor with port
-    public Server(Nodes[] node) {
-        int port = 0;
+    public Server(Nodes node) {
+        int port = node.getPortNumber();
         // starts server and waits for a connection
         try {
             server = new ServerSocket(port);
@@ -36,7 +36,7 @@ public class Server {
                     System.out.println(line);
 
                 } catch (IOException i) {
-                    System.out.println(i);
+                    i.printStackTrace();
                 }
             }
             System.out.println("Closing connection");
@@ -45,7 +45,7 @@ public class Server {
             socket.close();
             in.close();
         } catch (IOException i) {
-            System.out.println(i);
+            i.printStackTrace();
         }
     }
 }
