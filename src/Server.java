@@ -1,43 +1,35 @@
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server extends Thread{
+public class Server extends Thread {
+    //set up variables
+    private Nodes node;
+    private Thread t = null;
+
     //initialize socket and input stream
     private Socket socket = null;
     private ServerSocket server = null;
     private DataInputStream in = null;
-    private Thread t;
 
-    public void start() {
-        System.out.println("YAY SERVER STARTED MAYBE");
+    Server (Nodes node) {
+        this.node = node;
+    }
+
+    public void start () {
         if (t == null) {
-            t = new Thread (this);
-            t.start ();
+            t = new Thread(this);
+            t.start();
         }
     }
 
-
     // constructor with port
-    public Server(Nodes node) {
-        try
-        {
-            // Displaying the thread that is running
-            System.out.println ("Thread " +
-                    Thread.currentThread().getId() +
-                    " is running");
-
-        }
-        catch (Exception e)
-        {
-            // Throwing an exception
-            System.out.println ("Exception is caught");
-        }
-        int port = node.getPortNumber();
+    public void run() {
+        int port = this.node.getPortNumber();
         // starts server and waits for a connection
         try {
+            Process proc = Runtime.getRuntime().exec("cmd /c start cmd.exe");
+
             server = new ServerSocket(port);
             System.out.println("Server started");
 

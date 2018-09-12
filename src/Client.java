@@ -1,29 +1,30 @@
 import java.io.*;
 import java.net.*;
 
-public class Client extends Thread
-{
+public class Client extends Thread {
+    //set up the variables
+    private Nodes node;
+    private Thread t = null;
+
     // initialize socket and input output streams
     private Socket socket            = null;
     private DataInputStream input   = null;
     private DataOutputStream out     = null;
 
-    // constructor to put ip address and port
-    public Client(Nodes node)
-    {
-        try
-        {
-            // Displaying the thread that is running
-            System.out.println ("Thread " +
-                    Thread.currentThread().getId() +
-                    " is running");
+    Client (Nodes node) {
+        this.node = node;
+    }
 
+    public void start () {
+        if (t == null) {
+            t = new Thread(this);
+            t.start();
         }
-        catch (Exception e)
-        {
-            // Throwing an exception
-            System.out.println ("Exception is caught");
-        }
+    }
+
+    // constructor to put ip address and port
+    public void run()
+    {
         String address = node.getHostName();
         int port = node.getPortNumber();
         // establish a connection
@@ -40,11 +41,11 @@ public class Client extends Thread
         }
         catch(UnknownHostException u)
         {
-            System.out.println(u);
+            u.printStackTrace();
         }
         catch(IOException i)
         {
-            System.out.println(i);
+            i.printStackTrace();
         }
 
         // string to read message from input
@@ -60,7 +61,7 @@ public class Client extends Thread
             }
             catch(IOException i)
             {
-                System.out.println(i);
+                i.printStackTrace();
             }
         }
 
@@ -73,7 +74,7 @@ public class Client extends Thread
         }
         catch(IOException i)
         {
-            System.out.println(i);
+            i.printStackTrace();
         }
     }
 }

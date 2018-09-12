@@ -4,7 +4,7 @@ public class Nodes {
     private int nodeID;
     private String hostName;
     private int portNumber;
-    private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
+    private ArrayList<Integer> nodalConnections = new ArrayList<>();
 
     public void setNodeID(int i) {
         this.nodeID = i;
@@ -31,7 +31,7 @@ public class Nodes {
     }
 
     public int getPortNumber() {
-        return this.portNumber;
+        return this.portNumber; 
     }
 
     public ArrayList getNodalConnections() {
