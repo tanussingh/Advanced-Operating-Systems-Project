@@ -28,8 +28,6 @@ public class Server extends Thread {
         int port = this.node.getPortNumber();
         // starts server and waits for a connection
         try {
-            Process proc = Runtime.getRuntime().exec("cmd /c start cmd.exe");
-
             server = new ServerSocket(port);
             System.out.println("Server started");
 
