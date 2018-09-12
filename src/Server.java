@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class Server extends Thread{
+public class Server extends Thread {
     //initialize socket and input stream
     private Socket socket = null;
     private ServerSocket server = null;
@@ -26,16 +26,14 @@ public class Server extends Thread{
 
     // constructor with port
     public Server(Nodes node) {
-        try
-        {
+        try {
             // Displaying the thread that is running
             System.out.println ("Thread " +
                     Thread.currentThread().getId() +
                     " is running");
 
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             // Throwing an exception
             System.out.println ("Exception is caught");
         }
