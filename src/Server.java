@@ -19,6 +19,10 @@ public class Server extends Thread{
         }
     }
 
+    public Server () {
+        System.out.println("first");
+    }
+
 
     // constructor with port
     public Server(Nodes node) {

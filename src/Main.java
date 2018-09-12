@@ -34,7 +34,8 @@ public class Main {
         //create server
         //Server server = new Server(array_of_nodes[source]);
 
-        Server server = new Server(testNode);
+        Server server = new Server();
+        System.out.println("hello");
         server.start();
         //System.out.println("ran here?");
 
