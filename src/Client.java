@@ -7,9 +7,9 @@ public class Client extends Thread {
     private Thread t = null;
 
     // initialize socket and input output streams
-    private Socket socket            = null;
-    private DataInputStream input   = null;
-    private DataOutputStream out     = null;
+    private Socket socket = null;
+    private ObjectInputStream input = null;
+    private ObjectOutputStream out = null;
 
     Client (Nodes node) {
         this.node = node;
@@ -23,58 +23,54 @@ public class Client extends Thread {
     }
 
     // constructor to put ip address and port
-    public void run()
-    {
+    public void run() {
         String address = node.getHostName();
         int port = node.getPortNumber();
+        System.out.println("Client connecting to Host: " + address + " Port: " + port);
         // establish a connection
-        try
-        {
+        try {
             socket = new Socket(address, port);
-            System.out.println("Connected");
+            System.out.println("Client: Connected");
 
-            // takes input from terminal
-            input  = new DataInputStream(System.in);
+            // set up message
+            Message msg = new Message();
+            msg.buildMessage(address, port, null);
+            System.out.println("Client: Message to be sent: " + msg);
 
             // sends output to the socket
-            out    = new DataOutputStream(socket.getOutputStream());
-        }
-        catch(UnknownHostException u)
-        {
+            out = new ObjectOutputStream(socket.getOutputStream());
+            out.writeObject(msg);
+            out.flush();
+        } catch(UnknownHostException u) {
             u.printStackTrace();
-        }
-        catch(IOException i)
-        {
+        } catch(IOException i) {
             i.printStackTrace();
         }
 
         // string to read message from input
-        String line = "";
+        Message msg_in = new Message();
 
-        // keep reading until "Over" is input
-        while (!line.equals("Over"))
-        {
-            try
-            {
-                line = input.readLine();
-                out.writeUTF(line);
-            }
-            catch(IOException i)
-            {
-                i.printStackTrace();
-            }
+        // read reply from server
+        try {
+            input = new ObjectInputStream(socket.getInputStream());
+            msg_in = (Message) input.readObject();
+            System.out.println("Client: Message received from server " + msg_in);
+        } catch (ClassNotFoundException c) {
+            c.printStackTrace();
+        } catch(IOException i) {
+            i.printStackTrace();
         }
 
         // close the connection
-        try
-        {
+        try {
             input.close();
             out.close();
             socket.close();
-        }
-        catch(IOException i)
-        {
+            System.out.println("Client thread closed.");
+        } catch(IOException i) {
             i.printStackTrace();
         }
+
+        //return reply from server
     }
 }

@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Objects;
 
 public class Server extends Thread {
     //set up variables
@@ -10,7 +11,8 @@ public class Server extends Thread {
     //initialize socket and input stream
     private Socket socket = null;
     private ServerSocket server = null;
-    private DataInputStream in = null;
+    private ObjectInputStream in = null;
+    private ObjectOutputStream out = null;
 
     Server (Nodes node) {
         this.node = node;
@@ -29,36 +31,34 @@ public class Server extends Thread {
         // starts server and waits for a connection
         try {
             server = new ServerSocket(port);
-            System.out.println("Server started");
-
-            System.out.println("Waiting for a client ...");
+            System.out.println("Server: Server started at Host: " + this.node.getHostName() + " Port: " + port);
+            System.out.println("Server: Waiting for a client ...");
 
             socket = server.accept();
-            System.out.println("Client accepted");
+            System.out.println("Server: Client accepted");
 
             // takes input from the client socket
-            in = new DataInputStream(
-                    new BufferedInputStream(socket.getInputStream()));
+            Message msg = new Message();
+            in = new ObjectInputStream(socket.getInputStream());
+            msg = (Message) in.readObject();
+            System.out.println("Server: Message Received - " + msg);
 
-            String line = "";
-
-            // reads message from client until "Over" is sent
-            while (!line.equals("Over")) {
-                try {
-                    line = in.readUTF();
-                    System.out.println(line);
-
-                } catch (IOException i) {
-                    i.printStackTrace();
-                }
+            //reply to client
+            if (Objects.equals(msg.getDest_address(), this.node.getHostName())) {
+                msg.setNeighbour(this.node.getNodalConnections());
+                System.out.println("Server: Message to be sent back " + msg);
+                out = new ObjectOutputStream(socket.getOutputStream());
+                out.writeObject(msg);
+                out.flush();
             }
-            System.out.println("Closing connection");
-
             // close connection
             socket.close();
             in.close();
+            System.out.println("Server Thread Closed.");
         } catch (IOException i) {
             i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            c.printStackTrace();
         }
     }
 }

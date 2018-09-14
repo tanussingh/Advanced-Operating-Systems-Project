@@ -14,6 +14,14 @@ public class Message implements Serializable {
         this.neighbour = list;
     }
 
+    public void setNeighbour(ArrayList<Integer> neighbour) {
+        this.neighbour = neighbour;
+    }
+
+    public String getDest_address() {
+        return dest_address;
+    }
+
     public ArrayList<Integer> getNeighbour () {
         return this.neighbour;
     }
