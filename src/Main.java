@@ -10,7 +10,7 @@ public class Main {
         Nodes[] array_of_nodes = Parser.parse("src/config_file.txt");
 
         //figure out which machine this is
-        int source = 0;
+        int source = -1;
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 0; i < array_of_nodes.length; i++) {
@@ -28,9 +28,9 @@ public class Main {
 
 
         //spawn threads for multiple client
-        for (int i = 0; i < array_of_nodes[i].getNodalConnections().size(); i++)
+        for (int dest = 0; dest < array_of_nodes[source].getNodalConnections().size(); dest++)
         {
-            Client client = new Client(array_of_nodes[i]);
+            Client client = new Client(array_of_nodes[(int)(array_of_nodes[source].getNodalConnections().get(dest))]);
             client.start();
         }
     }
