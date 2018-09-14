@@ -35,21 +35,27 @@ public class Parser {
             while (valid_lines != numNode) {
                 line = bufferedReader.readLine();
                 empty = false;
+                int index;
                 //format each line to correct format
                 if (line.contains("#")) {
-                    int index = line.indexOf("#");
+                    index = line.indexOf("#");
                     line = line.substring(0, index);
                 }
                 if (line.isEmpty()) {
                     empty = true;
                 }
+                line = line.trim();
                 //create nodes
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
-                    node.setNodeID(Integer.parseInt(line.substring(0, 1)));
-                    node.setHostName(line.substring(2, 19));
-                    node.setPortNumber(Integer.parseInt(line.substring(20, 24)));
+                    index = line.indexOf(" ");
+                    node.setNodeID(Integer.parseInt(line.substring(0, index)));
+                    line = line.substring(index).trim();
+                    index = line.indexOf(" ");
+                    node.setHostName(line.substring(0, index));
+                    line = line.substring(index).trim();
+                    node.setPortNumber(Integer.parseInt(line.substring(0, 4)));
                     array_of_nodes[valid_lines] = node;
                     valid_lines++;
                 }
@@ -67,6 +73,7 @@ public class Parser {
                 if (line.isEmpty()) {
                     empty = true;
                 }
+                line = line.trim();
                 //create array to store nodal connections
                 if (!empty) {
                     int nodeId = Integer.parseInt(line.substring(0, 1));
