@@ -14,6 +14,7 @@ public class Main {
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 0; i < array_of_nodes.length; i++) {
+                thisHostName = "dc02.utdallas.edu";
                 if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
                     source = i;
                 }
@@ -23,15 +24,19 @@ public class Main {
         }
 
         //create server
-        Server server = new Server(array_of_nodes[source]);
+        Server server = new Server(array_of_nodes[1]);
         server.start();
 
-
         //spawn threads for multiple client
-        for (int dest = 0; dest < array_of_nodes[source].getNodalConnections().size(); dest++)
-        {
-            Client client = new Client(array_of_nodes[(int)(array_of_nodes[source].getNodalConnections().get(dest))]);
-            client.start();
+        for (int hops = 1; hops < array_of_nodes.length; hops++) {
+            for (int dest = 0; dest < array_of_nodes[source].getNodalConnections(hops).size(); dest++)
+            {
+                Client client = new Client(array_of_nodes[source], array_of_nodes[(int)(array_of_nodes[source].getNodalConnections(hops).get(dest))], hops);
+                //Client client = new Client(array_of_nodes[(int)(array_of_nodes[source].getNodalConnections(hops).get(dest))]);
+                client.start();
+            }
         }
+
+        System.out.println(array_of_nodes[0].getNodalConnections(2));
     }
 }

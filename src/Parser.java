@@ -49,6 +49,7 @@ public class Parser {
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
+                    node.setNodalConnections(numNode+1);
                     index = line.indexOf(" ");
                     node.setNodeID(Integer.parseInt(line.substring(0, index)));
                     line = line.substring(index).trim();
@@ -83,11 +84,13 @@ public class Parser {
                         int next;
                         if (!(line.indexOf(" ") == -1)) {
                             next = line.indexOf(" ");
-                            array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
+                            array_of_nodes[nodeId].addNodalConnections(1, Integer.parseInt(line.substring(0, next)));
+                            //array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
                             line = line.substring(next+1);
                         } else {
                             next = 1;
-                            array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
+                            array_of_nodes[nodeId].addNodalConnections(1, Integer.parseInt(line.substring(0, next)));
+                            //array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
                             line = null;
                         }
                     }

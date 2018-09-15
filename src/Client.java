@@ -3,7 +3,9 @@ import java.net.*;
 
 public class Client extends Thread {
     //set up the variables
-    private Nodes node;
+    private Nodes source;
+    private Nodes dest;
+    private int hops;
     private Thread t = null;
 
     // initialize socket and input output streams
@@ -11,8 +13,10 @@ public class Client extends Thread {
     private ObjectInputStream input = null;
     private ObjectOutputStream out = null;
 
-    Client (Nodes node) {
-        this.node = node;
+    Client (Nodes source, Nodes dest, int hops) {
+        this.source = source;
+        this.dest = dest;
+        this.hops = hops;
     }
 
     public void start () {
@@ -24,8 +28,8 @@ public class Client extends Thread {
 
     // constructor to put ip address and port
     public void run() {
-        String address = node.getHostName();
-        int port = node.getPortNumber();
+        String address = dest.getHostName();
+        int port = dest.getPortNumber();
         System.out.println("Client connecting to Host: " + address + " Port: " + port);
         // establish a connection
         try {
@@ -55,6 +59,8 @@ public class Client extends Thread {
             input = new ObjectInputStream(socket.getInputStream());
             msg_in = (Message) input.readObject();
             System.out.println("Client: Message received from server " + msg_in);
+            //pass msg.neighbour back to main
+            source.addNodalConnections(hops+1, msg_in.getNeighbour());
         } catch (ClassNotFoundException c) {
             c.printStackTrace();
         } catch(IOException i) {

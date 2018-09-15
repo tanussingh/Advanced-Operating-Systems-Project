@@ -45,7 +45,7 @@ public class Server extends Thread {
 
             //reply to client
             if (Objects.equals(msg.getDest_address(), this.node.getHostName())) {
-                msg.setNeighbour(this.node.getNodalConnections());
+                msg.setNeighbour(this.node.getNodalConnections(1));
                 System.out.println("Server: Message to be sent back " + msg);
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.writeObject(msg);
