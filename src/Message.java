@@ -2,16 +2,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 public class Message implements Serializable {
-    private int hops;
     private String dest_address;
     private int dest_port;
-    private int[] route;
+    private ArrayList<Integer> route;
     private ArrayList<Integer> neighbour = new ArrayList<>();
 
-    public void buildMessage(String dest_address, int dest_port, ArrayList<Integer> list) {
+    public void buildMessage(String dest_address, int dest_port, ArrayList<Integer> path) {
         this.dest_address = dest_address;
         this.dest_port = dest_port;
-        this.neighbour = list;
+        this.route = path;
     }
 
     public void setNeighbour(ArrayList<Integer> neighbour) {
@@ -28,6 +27,6 @@ public class Message implements Serializable {
 
     @Override
     public String toString() {
-        return "Message [hops=" + hops + ", dest_address=" + this.dest_address + ", dest_port=" + dest_port + ", route=" + route + ", neighbour=" + neighbour + "]";
+        return "Message [dest_address=" + this.dest_address + ", dest_port=" + dest_port + ", route=" + route + ", neighbour=" + neighbour + "]";
     }
 }

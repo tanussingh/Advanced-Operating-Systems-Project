@@ -37,6 +37,9 @@ public class Main {
             }
         }
 
-        System.out.println(array_of_nodes[0].getNodalConnections(2));
+        while (Thread.activeCount() > 2) {
+            //System.out.println(Thread.activeCount());
+        }
+        System.out.println("YAY");
     }
 }

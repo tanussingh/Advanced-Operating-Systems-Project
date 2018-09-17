@@ -27,38 +27,42 @@ public class Server extends Thread {
 
     // constructor with port
     public void run() {
-        int port = this.node.getPortNumber();
-        // starts server and waits for a connection
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Server: Server started at Host: " + this.node.getHostName() + " Port: " + port);
-            System.out.println("Server: Waiting for a client ...");
+        boolean finished = false;
+        while (!finished) {
+            int port = this.node.getPortNumber();
+            // starts server and waits for a connection
+            try {
+                server = new ServerSocket(port);
+                System.out.println("Server: Server started at Host: " + this.node.getHostName() + " Port: " + port);
+                System.out.println("Server: Waiting for a client ...");
 
-            socket = server.accept();
-            System.out.println("Server: Client accepted");
+                socket = server.accept();
+                System.out.println("Server: Client accepted");
 
-            // takes input from the client socket
-            Message msg = new Message();
-            in = new ObjectInputStream(socket.getInputStream());
-            msg = (Message) in.readObject();
-            System.out.println("Server: Message Received - " + msg);
+                // takes input from the client socket
+                Message msg = new Message();
+                in = new ObjectInputStream(socket.getInputStream());
+                msg = (Message) in.readObject();
+                System.out.println("Server: Message Received - " + msg);
 
-            //reply to client
-            if (Objects.equals(msg.getDest_address(), this.node.getHostName())) {
-                msg.setNeighbour(this.node.getNodalConnections(1));
-                System.out.println("Server: Message to be sent back " + msg);
-                out = new ObjectOutputStream(socket.getOutputStream());
-                out.writeObject(msg);
-                out.flush();
+                //reply to client
+                if (Objects.equals(msg.getDest_address(), this.node.getHostName())) {
+                    msg.setNeighbour(this.node.getNodalConnections(1));
+                    System.out.println("Server: Message to be sent back " + msg);
+                    out = new ObjectOutputStream(socket.getOutputStream());
+                    out.writeObject(msg);
+                    out.flush();
+                }
+                // close connection
+                socket.close();
+                in.close();
+                System.out.println("Server Thread Closed.");
+            } catch (IOException i) {
+                i.printStackTrace();
+            } catch (ClassNotFoundException c) {
+                c.printStackTrace();
             }
-            // close connection
-            socket.close();
-            in.close();
-            System.out.println("Server Thread Closed.");
-        } catch (IOException i) {
-            i.printStackTrace();
-        } catch (ClassNotFoundException c) {
-            c.printStackTrace();
+            finished = true;
         }
     }
 }
