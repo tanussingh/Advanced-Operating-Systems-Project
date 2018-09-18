@@ -40,7 +40,7 @@ public class Main {
             }
         }
 
-        while (Thread.activeCount() > 2) {
+        while (Thread.activeCount() > 1) {
             //System.out.println(Thread.activeCount());
         }
 

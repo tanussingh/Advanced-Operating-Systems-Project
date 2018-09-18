@@ -39,7 +39,7 @@ public class Server extends Thread {
                 server = new ServerSocket(port);
                 System.out.println("Server: Server started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
                 System.out.println("Server: Waiting for a client ...");
-                while (true) {
+                //while (true) {
                     //need to add a while loop here for server to accept more connections
                     socket = server.accept();
                     System.out.println("Server: Client accepted");
@@ -108,7 +108,7 @@ public class Server extends Thread {
                         System.out.println("Server: Error Occurred, This should never print out");
                     }
                     // close connection
-                }
+                //}
 
                 //System.out.println("Server Thread Closed.");
             } catch (IOException i) {

@@ -35,11 +35,11 @@ public class Client extends Thread {
         while (!finished) {
             // establish a connection
             try {
+                System.out.println("Client is sleeping");
+                t.sleep(5000);
+                System.out.println("Client started again");
                 System.out.println("Client connecting to Host: " + dest_node.getHostName() + " Port: " + dest_node.getPortNumber());
-                while (socket == null) {
-                    t.wait(5000);
-                    socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
-                }
+                socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
                 System.out.println("Client: Connected");
 
                 // set up message
@@ -51,10 +51,12 @@ public class Client extends Thread {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.writeObject(msg);
                 out.flush();
-            } catch (UnknownHostException u) {
-                u.printStackTrace();
-            } catch (IOException i) {
-                i.printStackTrace();
+            } catch (UnknownHostException x) {
+                x.printStackTrace();
+            } catch (IOException y) {
+                y.printStackTrace();
+            } catch (InterruptedException z) {
+                z.printStackTrace();
             }
 
             // close the connection
