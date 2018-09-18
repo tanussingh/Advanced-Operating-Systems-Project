@@ -1,10 +1,10 @@
 5
 
-0 dc07.utdallas.edu 1234
-1 dc08.utdallas.edu 1233
-2 dc09.utdallas.edu 1233
-3 dc10.utdallas.edu 1232
-4 dc11.utdallas.edu 1233
+0 dc25.utdallas.edu 1234
+1 dc26.utdallas.edu 1233
+2 dc27.utdallas.edu 1233
+3 dc28.utdallas.edu 1232
+4 dc29.utdallas.edu 1233
 
 0 1 2 4
 1 0 2 3
