@@ -74,17 +74,23 @@ public class Server extends Thread {
                                 neighbours.add(i);
                             }
                         }
+                        System.out.println("HELLO NEIGHBOR: " + array_of_nodes[source].getNodalConnections(1));
                         msg.setNeighbour(neighbours);
                         Collections.reverse(msg.getPath());
                         msg.setDestId(msg.getSourceId());
                         System.out.println("Server: Message to be sent back " + msg);
+
+                        int i = msg.getPath().indexOf(source);
+                        String next_hostname = array_of_nodes[i + 1].getHostName();
+                        int next_port = array_of_nodes[i + 1].getPortNumber();
+                        socket = new Socket(next_hostname, next_port);
                         out = new ObjectOutputStream(socket.getOutputStream());
                         out.writeObject(msg);
                         out.flush();
                         in.close();
                         out.close();
                         socket.close();
-                    } else if (!Objects.equals(msg.getDestId(), this.source) && (msg.getNeighbour() == null || msg.getNeighbour() != null)) {
+                    } else if (!Objects.equals(msg.getDestId(), this.source)) {
                         int i = msg.getPath().indexOf(source);
                         String next_hostname = array_of_nodes[i + 1].getHostName();
                         int next_port = array_of_nodes[i + 1].getPortNumber();
@@ -100,7 +106,7 @@ public class Server extends Thread {
                         in.close();
                         socket.close();
                     } else {
-                        System.out.println("Server: This should never print out");
+                        System.out.println("Server: Error Occured, This should never print out");
                     }
                     // close connection
                 }

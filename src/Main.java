@@ -1,4 +1,4 @@
-// Members: Helee Thumber (hat170030), Tanushri Singh (tts15030), Ko-Chen (Jack) Chen (kxc170002)
+// Members: Helee Thumber (hat170030), Tanushri Singh (tts150030), Ko-Chen (Jack) Chen (kxc170002)
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -7,14 +7,16 @@ import java.util.Objects;
 public class Main {
     public static void main(String[] args) {
         //parse config file
-        Nodes[] array_of_nodes = Parser.parse("src/config_file.txt");
+        String PATH = System.getProperty("user.dir");
+        PATH = PATH + "/CS6378/Project-1/src/config_file.txt";
+        System.out.println(PATH);
+        Nodes[] array_of_nodes = Parser.parse(PATH);
 
         //figure out which machine this is
         int source = -1;
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 0; i < array_of_nodes.length; i++) {
-                thisHostName = "dc02.utdallas.edu";
                 if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
                     source = i;
                 }
@@ -24,7 +26,7 @@ public class Main {
         }
 
         //create server
-        Server server = new Server(array_of_nodes, 1);
+        Server server = new Server(array_of_nodes, source);
         server.start();
 
         //spawn threads for multiple client
