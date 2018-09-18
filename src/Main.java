@@ -43,6 +43,8 @@ public class Main {
         while (Thread.activeCount() > 2) {
             //System.out.println(Thread.activeCount());
         }
-        System.out.println("YAY");
+
+        //Output Final Results
+        System.out.println("Final Results: ");
     }
 }

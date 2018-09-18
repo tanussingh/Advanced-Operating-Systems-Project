@@ -105,7 +105,7 @@ public class Server extends Thread {
                         in.close();
                         socket.close();
                     } else {
-                        System.out.println("Server: Error Occured, This should never print out");
+                        System.out.println("Server: Error Occurred, This should never print out");
                     }
                     // close connection
                 }
