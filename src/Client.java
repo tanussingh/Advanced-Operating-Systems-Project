@@ -36,7 +36,10 @@ public class Client extends Thread {
             // establish a connection
             try {
                 System.out.println("Client connecting to Host: " + dest_node.getHostName() + " Port: " + dest_node.getPortNumber());
-                socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
+                while (socket == null) {
+                    t.wait(5000);
+                    socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
+                }
                 System.out.println("Client: Connected");
 
                 // set up message
