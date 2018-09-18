@@ -6,7 +6,7 @@ public class Nodes {
     private String hostName;
     private int portNumber;
     //private int[] neighbours;
-    private ArrayList<ArrayList<Integer>> nodalConnections = new ArrayList<ArrayList<Integer>>();
+    private ArrayList<Integer>[] nodalConnections; //new ArrayList<ArrayList<Integer>>();
     //private int[][] neighbours;
 
     public void setNodeID(int i) {
@@ -22,19 +22,15 @@ public class Nodes {
     }
 
     public void setNodalConnections(int i) {
-        for (int j = 1; j < i+1; j++){
-            nodalConnections.add(new ArrayList<Integer>());
+        nodalConnections = new ArrayList[i];
+        for (int j = 0; j < i; j++){
+            nodalConnections[i] = new ArrayList<Integer>();
         }
     }
 
     //for parser
-    public void addNodalConnections(int hops, int i) {
-        this.nodalConnections.get(hops).add(i);
-    }
-
-    //for client
-    public void addNodalConnections(int hops, ArrayList<Integer> i) {
-        this.nodalConnections.get(hops).addAll(i);
+    public void addNodalConnections(ArrayList<Integer> path, int dest) {
+        this.nodalConnections[dest] = path;
     }
 
     public int getNodeID() {
@@ -49,7 +45,11 @@ public class Nodes {
         return this.portNumber; 
     }
 
-    public ArrayList getNodalConnections(int hops) {
-        return this.nodalConnections.get(hops);
+    public ArrayList getNodalConnections(int i) {
+        return this.nodalConnections[i];
+    }
+
+    public int getNodalConnectionsLength() {
+        return this.nodalConnections.length;
     }
 }

@@ -29,11 +29,12 @@ public class Main {
 
         //spawn threads for multiple client
         for (int hops = 1; hops < array_of_nodes.length; hops++) {
-            for (int dest = 0; dest < array_of_nodes[source].getNodalConnections(hops).size(); dest++)
+            for (int dest = 0; dest < array_of_nodes.length; dest++)
             {
-                Client client = new Client(array_of_nodes[source], array_of_nodes[(int)(array_of_nodes[source].getNodalConnections(hops).get(dest))], hops);
-                //Client client = new Client(array_of_nodes[(int)(array_of_nodes[source].getNodalConnections(hops).get(dest))]);
-                client.start();
+                if (array_of_nodes[source].getNodalConnections(dest).size() == hops) {
+                    Client client = new Client(array_of_nodes[source], array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber(), dest);
+                    client.start();
+                }
             }
         }
 

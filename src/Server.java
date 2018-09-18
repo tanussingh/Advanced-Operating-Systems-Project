@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class Server extends Thread {
@@ -40,14 +41,19 @@ public class Server extends Thread {
                 System.out.println("Server: Client accepted");
 
                 // takes input from the client socket
-                Message msg = new Message();
                 in = new ObjectInputStream(socket.getInputStream());
-                msg = (Message) in.readObject();
+                Message msg = (Message) in.readObject();
                 System.out.println("Server: Message Received - " + msg);
 
                 //reply to client
                 if (Objects.equals(msg.getDest_address(), this.node.getHostName())) {
-                    msg.setNeighbour(this.node.getNodalConnections(1));
+                    ArrayList<Integer> neighbours = new ArrayList<>();
+                    for (int i = 0; i < node.getNodalConnectionsLength(); i++) {
+                        if (node.getNodalConnections(i).size() == 1) {
+                            neighbours.add(i);
+                        }
+                    }
+                    msg.setNeighbour(neighbours);
                     System.out.println("Server: Message to be sent back " + msg);
                     out = new ObjectOutputStream(socket.getOutputStream());
                     out.writeObject(msg);

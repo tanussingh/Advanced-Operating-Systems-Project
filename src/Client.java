@@ -1,12 +1,14 @@
 import java.io.*;
+import java.lang.reflect.Array;
 import java.net.*;
 import java.util.ArrayList;
 
 public class Client extends Thread {
     //set up the variables
     private Nodes source;
-    private Nodes dest;
-    private int hops;
+    private String dest_addr;
+    private int dest_port;
+    private ArrayList<Integer> path;
     private Thread t = null;
 
     // initialize socket and input output streams
@@ -14,10 +16,11 @@ public class Client extends Thread {
     private ObjectInputStream input = null;
     private ObjectOutputStream out = null;
 
-    Client (Nodes source, Nodes dest, int hops) {
+    Client (Nodes source, String dest_addr, int dest_port, int dest) {
         this.source = source;
-        this.dest = dest;
-        this.hops = hops;
+        this.dest_addr = dest_addr;
+        this.dest_port = dest_port;
+        this.path = source.getNodalConnections(dest);
     }
 
     public void start () {
@@ -31,18 +34,15 @@ public class Client extends Thread {
     public void run() {
         boolean finished = false;
         while (!finished) {
-            String address = dest.getHostName();
-            int port = dest.getPortNumber();
             // establish a connection
             try {
-                System.out.println("Client connecting to Host: " + address + " Port: " + port);
-                socket = new Socket(address, port);
+                System.out.println("Client connecting to Host: " + dest_addr + " Port: " + dest_port);
+                socket = new Socket(dest_addr, dest_port);
                 System.out.println("Client: Connected");
 
                 // set up message
                 Message msg = new Message();
-                ArrayList<Integer> path = PathFinder.find(source, dest, hops);
-                msg.buildMessage(address, port, path);
+                msg.buildMessage(dest_addr, dest_port, path);
                 System.out.println("Client: Message to be sent: " + msg);
 
                 // sends output to the socket
