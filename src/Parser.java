@@ -78,7 +78,6 @@ public class Parser {
                 }
                 line = line.trim();
                 //create array to store nodal connections
-                ArrayList<Integer> path = new ArrayList<>();
                 if (!empty) {
                     int nodeId = Integer.parseInt(line.substring(0, 1));
                     line = line.substring(2);
@@ -87,11 +86,13 @@ public class Parser {
                         int next;
                         if (!(line.indexOf(" ") == -1)) {
                             next = line.indexOf(" ");
+                            ArrayList<Integer> path = new ArrayList<>();
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
                             line = line.substring(next+1);
                         } else {
                             next = 1;
+                            ArrayList<Integer> path = new ArrayList<>();
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
                             line = null;

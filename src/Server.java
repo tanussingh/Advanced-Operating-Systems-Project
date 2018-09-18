@@ -74,7 +74,6 @@ public class Server extends Thread {
                                 neighbours.add(i);
                             }
                         }
-                        System.out.println("HELLO NEIGHBOR: " + array_of_nodes[source].getNodalConnections(1));
                         msg.setNeighbour(neighbours);
                         Collections.reverse(msg.getPath());
                         msg.setDestId(msg.getSourceId());
