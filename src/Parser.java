@@ -29,7 +29,7 @@ public class Parser {
             FileReader fileReader = new FileReader(file);
             BufferedReader bufferedReader = new BufferedReader(fileReader);
             String line;
-            boolean empty = false;
+            boolean empty;
             int valid_lines = 0;
 
             //node info
@@ -51,7 +51,7 @@ public class Parser {
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
-                    node.setNodalConnections(numNode+1);
+                    node.setNodalConnections(numNode);
                     index = line.indexOf(" ");
                     node.setNodeID(Integer.parseInt(line.substring(0, index)));
                     line = line.substring(index).trim();

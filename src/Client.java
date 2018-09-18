@@ -5,22 +5,21 @@ import java.util.ArrayList;
 
 public class Client extends Thread {
     //set up the variables
-    private Nodes source;
-    private String dest_addr;
-    private int dest_port;
+    private Nodes source_node;
+    private Nodes dest_node;
+    private int destId;
     private ArrayList<Integer> path;
     private Thread t = null;
 
     // initialize socket and input output streams
     private Socket socket = null;
-    private ObjectInputStream input = null;
     private ObjectOutputStream out = null;
 
-    Client (Nodes source, String dest_addr, int dest_port, int dest) {
-        this.source = source;
-        this.dest_addr = dest_addr;
-        this.dest_port = dest_port;
-        this.path = source.getNodalConnections(dest);
+    Client (Nodes source_node, Nodes dest_node, int destId) {
+        this.source_node = source_node;
+        this.dest_node = dest_node;
+        this.destId = destId;
+        this.path = source_node.getNodalConnections(destId);
     }
 
     public void start () {
@@ -36,13 +35,13 @@ public class Client extends Thread {
         while (!finished) {
             // establish a connection
             try {
-                System.out.println("Client connecting to Host: " + dest_addr + " Port: " + dest_port);
-                socket = new Socket(dest_addr, dest_port);
+                System.out.println("Client connecting to Host: " + dest_node.getHostName() + " Port: " + dest_node.getPortNumber());
+                socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
                 System.out.println("Client: Connected");
 
                 // set up message
                 Message msg = new Message();
-                msg.buildMessage(dest_addr, dest_port, path);
+                msg.buildMessage(source_node.getNodeID(), destId, path);
                 System.out.println("Client: Message to be sent: " + msg);
 
                 // sends output to the socket
@@ -55,26 +54,8 @@ public class Client extends Thread {
                 i.printStackTrace();
             }
 
-            // string to read message from input
-            Message msg_in = new Message();
-
-            // read reply from server
-            try {
-                input = new ObjectInputStream(socket.getInputStream());
-                msg_in = (Message) input.readObject();
-                System.out.println("Client: Message received from server " + msg_in);
-                //pass msg.neighbour back to main
-                                                                                                                                                        // before adding check for dups
-                source.addNodalConnections(hops + 1, msg_in.getNeighbour());
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
-            } catch (IOException i) {
-                i.printStackTrace();
-            }
-
             // close the connection
             try {
-                input.close();
                 out.close();
                 socket.close();
                 System.out.println("Client thread closed.");
@@ -83,7 +64,5 @@ public class Client extends Thread {
             }
             finished = true;
         }
-
-        //return reply from server
     }
 }

@@ -3,5 +3,5 @@
 0 dc02.utdallas.edu 1234
 1 localhost 1233
 
-0 1 1
-1 2 3 4
+0 1
+1 0

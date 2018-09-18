@@ -24,7 +24,7 @@ public class Main {
         }
 
         //create server
-        Server server = new Server(array_of_nodes[1]);
+        Server server = new Server(array_of_nodes, 1);
         server.start();
 
         //spawn threads for multiple client
@@ -32,7 +32,7 @@ public class Main {
             for (int dest = 0; dest < array_of_nodes.length; dest++)
             {
                 if (array_of_nodes[source].getNodalConnections(dest).size() == hops) {
-                    Client client = new Client(array_of_nodes[source], array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber(), dest);
+                    Client client = new Client(array_of_nodes[source], array_of_nodes[dest], dest);
                     client.start();
                 }
             }
