@@ -89,13 +89,11 @@ public class Parser {
                             next = line.indexOf(" ");
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
-                            //array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
                             line = line.substring(next+1);
                         } else {
                             next = 1;
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
-                            //array_of_nodes[nodeId].addNodalConnections(Integer.parseInt(line.substring(0, next)));
                             line = null;
                         }
                     }
