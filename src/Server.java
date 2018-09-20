@@ -112,10 +112,8 @@ public class Server extends Thread {
                         System.out.println("Server: Error Occurred, This should never print out");
                     }
                 }
-            } catch (IOException i) {
+            } catch (IOException | ClassNotFoundException i) {
                 i.printStackTrace();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
             }
 
     }

@@ -50,12 +50,8 @@ public class Client extends Thread {
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.writeObject(msg);
                 out.flush();
-            } catch (UnknownHostException x) {
+            } catch (InterruptedException | IOException x) {
                 x.printStackTrace();
-            } catch (IOException y) {
-                y.printStackTrace();
-            } catch (InterruptedException z) {
-                z.printStackTrace();
             }
 
             // close the connection
