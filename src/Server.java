@@ -32,14 +32,14 @@ public class Server extends Thread {
     // constructor with port
     public void run() {
         boolean finished = false;
-        while (!finished) {
             int port = this.array_of_nodes[source].getPortNumber();
             // starts server and waits for a connection
             try {
                 server = new ServerSocket(port);
                 System.out.println("Server: Server started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
-                System.out.println("Server: Waiting for a client ...");
-                //while (true) {
+                while (!finished) {
+                    System.out.println("Server: Waiting for a client ...");
+                    //while (true) {
                     //need to add a while loop here for server to accept more connections
                     socket = server.accept();
                     System.out.println("Server: Client accepted");
@@ -48,6 +48,8 @@ public class Server extends Thread {
                     in = new ObjectInputStream(socket.getInputStream());
                     Message msg = (Message) in.readObject();
                     System.out.println("Server: Message Received - " + msg);
+                    in.close();
+                    socket.close();
 
                 /*
                 3 cases
@@ -60,41 +62,32 @@ public class Server extends Thread {
                  */
                     if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() != null) {
                         //stuff in neighbour is for this server
+                        System.out.println("Server: This message is mine updating...");
                         Collections.reverse(msg.getPath());
                         for (int i = 0; i < msg.getNeighbour().size(); i++) {
-                            array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
-                            array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
+                            if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).isEmpty()) && (msg.getNeighbour().get(i) != source)) {
+                                array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
+                                array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
+                            }
                         }
-                        in.close();
-                        socket.close();
+                        System.out.println("4. Server: Has added " + msg + " to myself");
                     } else if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() == null) {
                         ArrayList<Integer> neighbours = new ArrayList<>();
                         for (int i = 0; i < array_of_nodes[source].getNodalConnectionsLength(); i++) {
-                            if (array_of_nodes[source].getNodalConnections(i).size() == 1) {
+                            if (array_of_nodes[source].getNodalConnections(i).size() == 2) {
                                 neighbours.add(i);
                             }
                         }
                         msg.setNeighbour(neighbours);
                         Collections.reverse(msg.getPath());
                         msg.setDestId(msg.getSourceId());
+                        msg.setSourceId(source);
                         System.out.println("Server: Message to be sent back " + msg);
 
                         int i = msg.getPath().indexOf(source);
-                        String next_hostname = array_of_nodes[i + 1].getHostName();
-                        int next_port = array_of_nodes[i + 1].getPortNumber();
-                        socket = new Socket(next_hostname, next_port);
-                        out = new ObjectOutputStream(socket.getOutputStream());
-                        out.writeObject(msg);
-                        out.flush();
-                        in.close();
-                        out.close();
-                        socket.close();
-                    } else if (!Objects.equals(msg.getDestId(), this.source)) {
-                        int i = msg.getPath().indexOf(source);
-                        String next_hostname = array_of_nodes[i + 1].getHostName();
-                        int next_port = array_of_nodes[i + 1].getPortNumber();
-                        socket.close();
-
+                        i = msg.getPath().get(i + 1);
+                        String next_hostname = array_of_nodes[i].getHostName();
+                        int next_port = array_of_nodes[i].getPortNumber();
                         System.out.println("Server: connecting to Host: " + next_hostname + " Port: " + next_port);
                         socket = new Socket(next_hostname, next_port);
                         System.out.println("Server: Connected");
@@ -102,12 +95,26 @@ public class Server extends Thread {
                         out.writeObject(msg);
                         out.flush();
                         out.close();
-                        in.close();
+                        socket.close();
+                    } else if (!Objects.equals(msg.getDestId(), this.source)) {
+                        System.out.println("Server: Passing on msg " + msg);
+                        int i = msg.getPath().indexOf(source);
+                        i = msg.getPath().get(i + 1);
+                        String next_hostname = array_of_nodes[i].getHostName();
+                        int next_port = array_of_nodes[i].getPortNumber();
+                        System.out.println("Server: connecting to Host: " + next_hostname + " Port: " + next_port);
+                        socket = new Socket(next_hostname, next_port);
+                        System.out.println("Server: Connected");
+                        out = new ObjectOutputStream(socket.getOutputStream());
+                        out.writeObject(msg);
+                        out.flush();
+                        out.close();
                         socket.close();
                     } else {
                         System.out.println("Server: Error Occurred, This should never print out");
                     }
-                    // close connection
+
+                }   // close connection
                 //}
 
                 //System.out.println("Server Thread Closed.");
@@ -116,7 +123,6 @@ public class Server extends Thread {
             } catch (ClassNotFoundException c) {
                 c.printStackTrace();
             }
-            finished = true;
-        }
+
     }
 }

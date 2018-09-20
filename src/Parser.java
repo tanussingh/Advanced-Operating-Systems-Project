@@ -87,12 +87,14 @@ public class Parser {
                         if (!(line.indexOf(" ") == -1)) {
                             next = line.indexOf(" ");
                             ArrayList<Integer> path = new ArrayList<>();
+                            path.add(nodeId);
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
                             line = line.substring(next+1);
                         } else {
                             next = 1;
                             ArrayList<Integer> path = new ArrayList<>();
+                            path.add(nodeId);
                             path.add(Integer.parseInt(line.substring(0, next)));
                             array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
                             line = null;

@@ -33,18 +33,40 @@ public class Main {
         for (int hops = 1; hops < array_of_nodes.length; hops++) {
             for (int dest = 0; dest < array_of_nodes.length; dest++)
             {
-                if (array_of_nodes[source].getNodalConnections(dest).size() == hops) {
+                if (array_of_nodes[source].getNodalConnections(dest).size() == (hops + 1)) {
                     Client client = new Client(array_of_nodes[source], array_of_nodes[dest], dest);
                     client.start();
                 }
             }
+            try {
+                Thread.sleep(7000);
+            } catch (InterruptedException x) {
+                x.printStackTrace();
+            }
+            System.out.println("---------TESTTTT=----------");
+            for (int i = 0; i < array_of_nodes[source].getNodalConnectionsLength(); i++) {
+                System.out.println(array_of_nodes[source].getNodalConnections(i));
+            }
+
         }
 
-        while (Thread.activeCount() > 1) {
-            //System.out.println(Thread.activeCount());
+        while (Thread.activeCount() > 2) {
+            if (Thread.activeCount() == 2) {//waits till == 2 which means only main and server
+                break;
+            }
         }
 
         //Output Final Results
         System.out.println("Final Results: ");
+        System.out.println("Source Node: " + source);
+        for (int i = 0; i < array_of_nodes[source].getNodalConnectionsLength() - 1; i++) { //loop through to find what server for each hop i = hop number
+            System.out.print("Hops: " + i + " - ");
+            for (int j = 0; j < array_of_nodes[source].getNodalConnectionsLength() - 1; j++) { //loop through to print server for this hop j = server
+                if (array_of_nodes[source].getNodalConnections(j).size() == i+1) {
+                    System.out.print(j + " ");
+                }
+            }
+            System.out.println();
+        }
     }
 }

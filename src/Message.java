@@ -14,6 +14,10 @@ public class Message implements Serializable {
         this.neighbour = null;
     }
 
+    public void setSourceId (int i) {
+        this.sourceId = i;
+    }
+
     public void setDestId (int i) {
         this.destId = i;
     }

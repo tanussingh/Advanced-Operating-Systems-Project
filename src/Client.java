@@ -36,7 +36,7 @@ public class Client extends Thread {
             // establish a connection
             try {
                 System.out.println("Client is sleeping");
-                t.sleep(5000);
+                t.sleep(3000);
                 System.out.println("Client started again");
                 System.out.println("Client connecting to Host: " + dest_node.getHostName() + " Port: " + dest_node.getPortNumber());
                 socket = new Socket(dest_node.getHostName(), dest_node.getPortNumber());
