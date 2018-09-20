@@ -1,0 +1,6 @@
+# ignore all .iml
+*.iml
+
+#ignore all files idea produces
+.idea/
+out/
