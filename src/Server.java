@@ -36,11 +36,9 @@ public class Server extends Thread {
             // starts server and waits for a connection
             try {
                 server = new ServerSocket(port);
-                System.out.println("Server: Server started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
+                System.out.println("Server: Started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
                 while (!finished) {
                     System.out.println("Server: Waiting for a client ...");
-                    //while (true) {
-                    //need to add a while loop here for server to accept more connections
                     socket = server.accept();
                     System.out.println("Server: Client accepted");
 
@@ -51,18 +49,18 @@ public class Server extends Thread {
                     in.close();
                     socket.close();
 
-                /*
-                3 cases
-                1. if dest = this server && neighbour != null
-                2. if dest = this server && neighbour = null
-                3. if dest != this server
-                 */
-                /*
-                to send back to orig source, replace destID and invert path
-                 */
+                    /*
+                    3 cases
+                    1. if dest = this server && neighbour != null
+                    2. if dest = this server && neighbour = null
+                    3. if dest != this server
+                     */
+                    /*
+                    to send back to orig source, replace destID and invert path
+                     */
                     if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() != null) {
                         //stuff in neighbour is for this server
-                        System.out.println("Server: This message is mine updating...");
+                        System.out.println("Server: Updating...");
                         Collections.reverse(msg.getPath());
                         for (int i = 0; i < msg.getNeighbour().size(); i++) {
                             if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).isEmpty()) && (msg.getNeighbour().get(i) != source)) {
@@ -70,7 +68,7 @@ public class Server extends Thread {
                                 array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
                             }
                         }
-                        System.out.println("4. Server: Has added " + msg + " to myself");
+                        System.out.println("Server: Updated");
                     } else if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() == null) {
                         ArrayList<Integer> neighbours = new ArrayList<>();
                         for (int i = 0; i < array_of_nodes[source].getNodalConnectionsLength(); i++) {
@@ -88,7 +86,7 @@ public class Server extends Thread {
                         i = msg.getPath().get(i + 1);
                         String next_hostname = array_of_nodes[i].getHostName();
                         int next_port = array_of_nodes[i].getPortNumber();
-                        System.out.println("Server: connecting to Host: " + next_hostname + " Port: " + next_port);
+                        System.out.println("Server: Connecting to Host: " + next_hostname + " Port: " + next_port);
                         socket = new Socket(next_hostname, next_port);
                         System.out.println("Server: Connected");
                         out = new ObjectOutputStream(socket.getOutputStream());
@@ -97,7 +95,7 @@ public class Server extends Thread {
                         out.close();
                         socket.close();
                     } else if (!Objects.equals(msg.getDestId(), this.source)) {
-                        System.out.println("Server: Passing on msg " + msg);
+                        System.out.println("Server: Passing on msg");
                         int i = msg.getPath().indexOf(source);
                         i = msg.getPath().get(i + 1);
                         String next_hostname = array_of_nodes[i].getHostName();
@@ -113,11 +111,7 @@ public class Server extends Thread {
                     } else {
                         System.out.println("Server: Error Occurred, This should never print out");
                     }
-
-                }   // close connection
-                //}
-
-                //System.out.println("Server Thread Closed.");
+                }
             } catch (IOException i) {
                 i.printStackTrace();
             } catch (ClassNotFoundException c) {

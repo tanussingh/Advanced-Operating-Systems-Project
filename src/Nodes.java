@@ -46,7 +46,7 @@ public class Nodes {
         return this.portNumber; 
     }
 
-    public ArrayList getNodalConnections(int i) {
+    public ArrayList<Integer> getNodalConnections(int i) {
         return this.nodalConnections[i];
     }
 
