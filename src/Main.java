@@ -59,10 +59,10 @@ public class Main {
         //Output Final Results
         System.out.println("Final Results: ");
         System.out.println("Source Node: " + source);
-        for (int i = 0; i < array_of_nodes[source].getNodalConnectionsLength() - 1; i++) { //loop through to find what server for each hop i = hop number
+        for (int i = 1; i < array_of_nodes[source].getNodalConnectionsLength(); i++) { //loop through to find what server for each hop i = hop number
             System.out.print("Hops: " + i + " - ");
-            for (int j = 0; j < array_of_nodes[source].getNodalConnectionsLength() - 1; j++) { //loop through to print server for this hop j = server
-                if (array_of_nodes[source].getNodalConnections(j).size() == i+1) {
+            for (int j = 0; j < array_of_nodes[source].getNodalConnectionsLength(); j++) { //loop through to print server for this hop j = server
+                if (array_of_nodes[source].getNodalConnections(j).size() == i + 1) {
                     System.out.print(j + " ");
                 }
             }
