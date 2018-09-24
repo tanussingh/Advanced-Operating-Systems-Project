@@ -66,6 +66,9 @@ public class Server extends Thread {
                             if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).isEmpty()) && (msg.getNeighbour().get(i) != source)) {
                                 array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
                                 array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
+                            } else if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).size() > ((msg.getPath().size()) + 1)) && (msg.getNeighbour().get(i) != source)) {
+                                array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
+                                array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
                             }
                         }
                         System.out.println("Server: Updated");
