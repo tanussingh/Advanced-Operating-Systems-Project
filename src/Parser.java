@@ -83,7 +83,7 @@ public class Parser {
                     while (line != null) {
                         //parse info
                         int next;
-                        if (!(line.indexOf(" ") == -1)) {
+                        if (line.contains(" ")) {
                             next = line.indexOf(" ");
                             ArrayList<Integer> path = new ArrayList<>();
                             path.add(nodeId);
