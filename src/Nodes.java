@@ -26,7 +26,8 @@ public class Nodes {
     }
 
     public void addNodalConnections(ArrayList<Integer> path, int dest) {
-        this.nodalConnections[dest] = path;
+        this.nodalConnections[dest] = new ArrayList<>();
+        this.nodalConnections[dest].addAll(path);
     }
 
     public void addNodalConnections(int dest) {

@@ -63,10 +63,10 @@ public class Server extends Thread {
                         System.out.println("Server: Updating...");
                         Collections.reverse(msg.getPath());
                         for (int i = 0; i < msg.getNeighbour().size(); i++) {
-                            if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).isEmpty()) && (msg.getNeighbour().get(i) != source)) {
+                            if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).size() > msg.getPath().size() ) && (msg.getNeighbour().get(i) != source)) {
                                 array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
                                 array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
-                            } else if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).size() > ((msg.getPath().size()) + 1)) && (msg.getNeighbour().get(i) != source)) {
+                            }else if ((array_of_nodes[source].getNodalConnections(msg.getNeighbour().get(i)).isEmpty()) && (msg.getNeighbour().get(i) != source)) {
                                 array_of_nodes[source].addNodalConnections(msg.getPath(), msg.getNeighbour().get(i));
                                 array_of_nodes[source].addNodalConnections(msg.getNeighbour().get(i));
                             }
