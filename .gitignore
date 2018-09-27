@@ -1,5 +1,5 @@
 # ignore all .iml
-*.iml
+/*.iml
 
 #ignore all files idea produces
 .idea/
