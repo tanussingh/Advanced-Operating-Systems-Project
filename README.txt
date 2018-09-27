@@ -1,4 +1,4 @@
-Group Members:
+Project 2 Group Members:
 Tanushri Singh (tts150030)
 Helee Thumber (hat170030)
 Ko-Chen (Jack) Chen (kxc170002)
