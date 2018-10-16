@@ -13,6 +13,7 @@ public class Main {
         Nodes[] array_of_nodes = Parser.parse("./config_file.txt");
 
         System.out.println(array_of_nodes);
+        
 
         /*
         //figure out which machine this is
