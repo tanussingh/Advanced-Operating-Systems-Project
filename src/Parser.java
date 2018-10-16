@@ -6,38 +6,53 @@ import java.util.ArrayList;
 
 public class Parser {
     public static Nodes[] parse (String PATH) {
-        //get number of nodes
+        File file = new File(PATH);
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
         int numNode = 0;
+        boolean found = false;
+        String line;
+        int index;
+        boolean empty;
+
+        //read numNode
         try {
             //open file
-            File file = new File(PATH);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            numNode = Integer.parseInt(bufferedReader.readLine());
-            bufferedReader.close();
+            fileReader = new FileReader(file);
+            bufferedReader = new BufferedReader(fileReader);
+            
+            //get numNodes
+            while (!found) {
+                line = bufferedReader.readLine();
+                empty = false;
+                //format line to just have what we want
+                if (line.contains("#")) {
+                    index = line.indexOf("#");
+                    line = line.substring(0, index);
+                }
+                if (line.isEmpty()) {
+                    empty = true;
+                }
+                line = line.trim();
+                //create nodes
+                if (!empty) {
+                    //parse info
+                    numNode = Integer.parseInt(line);
+                    found = true;
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        //build the array of nodes
-        Nodes[] array_of_nodes = new Nodes[numNode];
-
+        //populate node infomation
+        Nodes[] array_of_nodes = new Nodes[numNode + 1];
         try {
-            //open file
-            File file = new File(PATH);
-            FileReader fileReader = new FileReader(file);
-            BufferedReader bufferedReader = new BufferedReader(fileReader);
-            String line;
-            boolean empty;
-            int valid_lines = 0;
-
-            //node info
-            line = bufferedReader.readLine();
-            while (valid_lines != numNode) {
+            int valid_lines = 1;
+            while (valid_lines != numNode + 1) {
                 line = bufferedReader.readLine();
                 empty = false;
-                int index;
-                //format each line to correct format
+                //format line to just have what we want
                 if (line.contains("#")) {
                     index = line.indexOf("#");
                     line = line.substring(0, index);
@@ -50,61 +65,34 @@ public class Parser {
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
-                    node.setNodalConnections(numNode);
+                    node.setNodalConnections(numNode + 1);
+                    node.setNodeID(valid_lines);
                     index = line.indexOf(" ");
-                    node.setNodeID(Integer.parseInt(line.substring(0, index)));
+                    node.setHostName(line.substring(0, index) + ".utdallas.edu");
                     line = line.substring(index).trim();
                     index = line.indexOf(" ");
-                    node.setHostName(line.substring(0, index));
+                    node.setPortNumber(Integer.parseInt(line.substring(0, index)));
                     line = line.substring(index).trim();
-                    node.setPortNumber(Integer.parseInt(line.substring(0, 4)));
+                    while (line != null) {
+                        if (line.contains(" ")) {
+                            index = line.indexOf(" ");
+                            ArrayList<Integer> path = new ArrayList<>();
+                            path.add(valid_lines);
+                            path.add(Integer.parseInt(line.substring(0, index)));
+                            node.addNodalConnections(path, Integer.parseInt(line.substring(0, index)));
+                            line = line.substring(index + 1);
+                        } else {
+                            ArrayList<Integer> path = new ArrayList<>();
+                            path.add(valid_lines);
+                            path.add(Integer.parseInt(line));
+                            node.addNodalConnections(path, Integer.parseInt(line));
+                            line = null;
+                        }
+                    }
                     array_of_nodes[valid_lines] = node;
                     valid_lines++;
                 }
             }
-            //nodal connections
-            valid_lines = 0;
-            while (valid_lines != numNode) {
-                line = bufferedReader.readLine();
-                empty = false;
-                //format each line to correct format
-                if (line.contains("#")) {
-                    int index = line.indexOf("#");
-                    line = line.substring(0, index);
-                }
-                if (line.isEmpty()) {
-                    empty = true;
-                }
-                line = line.trim();
-                //create array to store nodal connections
-                if (!empty) {
-                    int next = line.indexOf(" ");
-                    int nodeId = Integer.parseInt(line.substring(0, next));
-                    line = line.substring(next+1);
-                    while (line != null) {
-                        //parse info
-                        next = 0;
-                        if (line.contains(" ")) {
-                            next = line.indexOf(" ");
-                            ArrayList<Integer> path = new ArrayList<>();
-                            path.add(nodeId);
-                            System.out.print(line.substring(0, next));
-                            path.add(Integer.parseInt(line.substring(0, next)));
-                            array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line.substring(0, next)));
-                            line = line.substring(next+1);
-                        } else {
-                            //next = 1;
-                            ArrayList<Integer> path = new ArrayList<>();
-                            path.add(nodeId);
-                            path.add(Integer.parseInt(line));
-                            array_of_nodes[nodeId].addNodalConnections(path, Integer.parseInt(line));
-                            line = null;
-                        }
-                    }
-                    valid_lines++;
-                }
-            }
-            bufferedReader.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

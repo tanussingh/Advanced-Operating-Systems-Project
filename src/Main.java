@@ -12,8 +12,17 @@ public class Main {
         PATH = PATH + "/CS6378/Project-1/src/config_file.txt";
         Nodes[] array_of_nodes = Parser.parse("./config_file.txt");
 
-        System.out.println(array_of_nodes);
-        
+        System.out.println(array_of_nodes[1].getNodeID() + array_of_nodes[1].getHostName() + array_of_nodes[1].getPortNumber());
+        System.out.println(array_of_nodes[2].getNodeID() + array_of_nodes[2].getHostName() + array_of_nodes[2].getPortNumber());
+        System.out.println(array_of_nodes[3].getNodeID() + array_of_nodes[3].getHostName() + array_of_nodes[3].getPortNumber());
+        System.out.println(array_of_nodes[4].getNodeID() + array_of_nodes[4].getHostName() + array_of_nodes[4].getPortNumber());
+        System.out.println(array_of_nodes[5].getNodeID() + array_of_nodes[5].getHostName() + array_of_nodes[5].getPortNumber());
+
+        for (int i = 1; i < 6; i++) {
+            for (int j = 1; j < 6; j++) {
+                System.out.println(array_of_nodes[i].getNodalConnections(j));
+            }
+        }
 
         /*
         //figure out which machine this is
