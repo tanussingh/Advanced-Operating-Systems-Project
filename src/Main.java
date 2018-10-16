@@ -23,6 +23,7 @@ public class Main {
                 System.out.println(array_of_nodes[i].getNodalConnections(j));
             }
         }
+        
 
         /*
         //figure out which machine this is
