@@ -27,6 +27,14 @@ public class Nodes {
         }
     }
 
+    public void setKnown(boolean value){
+        this.known = value;
+    }
+
+    public void setDiscovered(boolean value){
+        this.discovered = value;
+    }
+
     public void addNodalConnections(ArrayList<Integer> path, int dest) {
         this.nodalConnections[dest] = new ArrayList<>();
         this.nodalConnections[dest].addAll(path);
@@ -56,11 +64,11 @@ public class Nodes {
         return this.nodalConnections.length;
     }
 
-    public void setKnown(boolean value){
-        this.known = value;
+    public boolean getKnown(){
+        return this.known;
     }
 
-    public void setDiscovered(boolean value){
-        this.discovered = value;
+    public boolean getDiscovered(){
+        return this.discovered;
     }
 }
