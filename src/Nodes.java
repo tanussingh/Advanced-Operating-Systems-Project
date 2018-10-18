@@ -5,6 +5,8 @@ public class Nodes {
     private String hostName;
     private int portNumber;
     private ArrayList<Integer>[] nodalConnections;
+    private boolean known;
+    private boolean discovered;
 
     public void setNodeID(int i) {
         this.nodeID = i;
@@ -52,5 +54,13 @@ public class Nodes {
 
     public int getNodalConnectionsLength() {
         return this.nodalConnections.length;
+    }
+
+    public void setKnown(boolean value){
+        this.known = value;
+    }
+
+    public void setDiscovered(boolean value){
+        this.discovered = value;
     }
 }
