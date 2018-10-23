@@ -4,9 +4,8 @@ public class Nodes {
     private int nodeID;
     private String hostName;
     private int portNumber;
-    private ArrayList<Integer>[] nodalConnections;
-    private boolean known;
-    private boolean discovered;
+    private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
+    private boolean discovered = false;
 
     public void setNodeID(int i) {
         this.nodeID = i;
@@ -20,30 +19,14 @@ public class Nodes {
         this.portNumber = i;
     }
 
-    public void setNodalConnections(int i) {
-        nodalConnections = new ArrayList[i];
-        for (int j = 0; j < i; j++){
-            nodalConnections[j] = new ArrayList<>();
-        }
-    }
-
-    public void setKnown(boolean value){
-        this.known = value;
+    public void addNodalConnections(int neighbour) {
+        this.nodalConnections.add(neighbour);
     }
 
     public void setDiscovered(boolean value){
         this.discovered = value;
     }
-
-    public void addNodalConnections(ArrayList<Integer> path, int dest) {
-        this.nodalConnections[dest] = new ArrayList<>();
-        this.nodalConnections[dest].addAll(path);
-    }
-
-    public void addNodalConnections(int dest) {
-        this.nodalConnections[dest].add(dest);
-    }
-
+    
     public int getNodeID() {
         return this.nodeID;
     }
@@ -56,16 +39,8 @@ public class Nodes {
         return this.portNumber; 
     }
 
-    public ArrayList<Integer> getNodalConnections(int i) {
-        return this.nodalConnections[i];
-    }
-
-    public int getNodalConnectionsLength() {
-        return this.nodalConnections.length;
-    }
-
-    public boolean getKnown(){
-        return this.known;
+    public ArrayList<Integer> getNodalConnections() {
+        return this.nodalConnections;
     }
 
     public boolean getDiscovered(){

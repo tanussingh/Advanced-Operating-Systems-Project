@@ -65,7 +65,6 @@ public class Parser {
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
-                    node.setNodalConnections(numNode + 1);
                     node.setNodeID(valid_lines);
                     index = line.indexOf(" ");
                     node.setHostName(line.substring(0, index) + ".utdallas.edu");
@@ -76,16 +75,10 @@ public class Parser {
                     while (line != null) {
                         if (line.contains(" ")) {
                             index = line.indexOf(" ");
-                            ArrayList<Integer> path = new ArrayList<>();
-                            path.add(valid_lines);
-                            path.add(Integer.parseInt(line.substring(0, index)));
-                            node.addNodalConnections(path, Integer.parseInt(line.substring(0, index)));
+                            node.addNodalConnections(Integer.parseInt(line.substring(0, index)));
                             line = line.substring(index + 1);
                         } else {
-                            ArrayList<Integer> path = new ArrayList<>();
-                            path.add(valid_lines);
-                            path.add(Integer.parseInt(line));
-                            node.addNodalConnections(path, Integer.parseInt(line));
+                            node.addNodalConnections(Integer.parseInt(line));
                             line = null;
                         }
                     }

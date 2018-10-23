@@ -16,7 +16,10 @@ public class Main {
         int source = -1;
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
-            for (int i = 0; i < array_of_nodes.length; i++) {
+            for (int i = 1; i < array_of_nodes.length; i++) {
+                //line for testing
+                thisHostName = "dc01.utdallas.edu";
+                //end testing line
                 if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
                     source = i;
                 }
@@ -29,6 +32,7 @@ public class Main {
         Server server = new Server(array_of_nodes, source);
         server.start();
 
+        /*
         //spawn threads for multiple client
         for (int hops = 1; hops < array_of_nodes.length; hops++) {
             for (int dest = 0; dest < array_of_nodes.length; dest++)
@@ -63,6 +67,7 @@ public class Main {
             }
             System.out.println();
         }
+        */
 
     }
 }

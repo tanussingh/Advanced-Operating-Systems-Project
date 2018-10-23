@@ -13,9 +13,15 @@ public class Server extends Thread {
 
     //initialize socket and input/output stream
     private ServerSocket server = null;
-    private Socket socket = null;
+    private Socket inSocket = null;
+    private Socket outSocket = null;
     private ObjectInputStream in = null;
     private ObjectOutputStream out = null;
+
+    //Set up messages
+    String reqMsg = "REQ";
+    String ackMsg = "ACK";
+    String nackMsg = "NACK";
 
     Server (Nodes[] array_of_nodes, int source) {
         this.array_of_nodes = array_of_nodes;
@@ -37,7 +43,66 @@ public class Server extends Thread {
             try {
                 server = new ServerSocket(port);
                 System.out.println("Server: Started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
+                Thread.sleep(2000);
+                if (source == 1) {
+                    array_of_nodes[source].setDiscovered(true);
+                    //send to all children ie neighbours
+                    for (int i = 0; i < array_of_nodes[source].getNodalConnections().size(); i++) {
+                        String hostName = array_of_nodes[array_of_nodes[source].getNodalConnections().get(i)].getHostName();
+                        int portNum = array_of_nodes[array_of_nodes[source].getNodalConnections().get(i)].getPortNumber();
+                        int dest = array_of_nodes[source].getNodalConnections().get(i);
+                        Packet packet = new Packet();
+                        packet.buildPacket(array_of_nodes[source].getNodeID(), array_of_nodes[dest].getNodeID(), reqMsg);
+                        System.out.println("Client: Packet to be sent: " + packet);
+                        outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
+                        out = new ObjectOutputStream(outSocket.getOutputStream());
+                        out.writeObject(packet);
+                        out.flush();
+                        out.close();
+                        outSocket.close();
+                    }
+                }
                 while (!finished) {
+                    System.out.println("Server: Waiting for a client ...");
+                    inSocket = server.accept();
+                    System.out.println("Server: Client accepted");
+                    in = new ObjectInputStream(inSocket.getInputStream());
+                    Packet packet = (Packet) in.readObject();
+                    System.out.println("Server: Packet Received - " + packet);
+                    in.close();
+
+                    //get info out of msg
+                    int source = packet.getSourceId();
+                    int dest = packet.getDestId();
+                    String msg = packet.getMsg();
+
+                    //if flag == 0
+                    if (!(array_of_nodes[source].getDiscovered())) {
+                        //return ack
+                        packet = new Packet();
+                        packet.buildPacket(dest, source, ackMsg);
+                        outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                        out = new ObjectOutputStream(outSocket.getOutputStream());
+                        out.writeObject(packet);
+                        out.flush();
+                        out.close();
+                        outSocket.close();
+                        
+                        //mark own flag and remember parent
+                        array_of_nodes[source].setDiscovered(true);
+                    } else if (array_of_nodes[source].getDiscovered()) {
+                        //send nack
+                        packet = new Packet();
+                        packet.buildPacket(dest, source, nackMsg);
+                        outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                        out = new ObjectOutputStream(outSocket.getOutputStream());
+                        out.writeObject(packet);
+                        out.flush();
+                        out.close();
+                        outSocket.close();
+                    }
+                }
+                /*while (!finished) {
                     System.out.println("Server: Waiting for a client ...");
                     socket = server.accept();
                     System.out.println("Server: Client accepted");
@@ -58,7 +123,7 @@ public class Server extends Thread {
                     /*
                     to send back to orig source, replace destID and invert path
                      */
-                    if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() != null) {
+                    /*if (Objects.equals(msg.getDestId(), this.source) && msg.getNeighbour() != null) {
                         //stuff in neighbour is for this server
                         System.out.println("Server: Updating...");
                         Collections.reverse(msg.getPath());
@@ -114,9 +179,9 @@ public class Server extends Thread {
                     } else {
                         System.out.println("Server: Error Occurred, This should never print out");
                     }
-                }
-            } catch (IOException | ClassNotFoundException i) {
-                i.printStackTrace();
+                }*/
+            } catch (IOException | InterruptedException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
 
     }
