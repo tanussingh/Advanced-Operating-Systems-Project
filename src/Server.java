@@ -8,8 +8,9 @@ import java.util.Objects;
 public class Server extends Thread {
     //set up variables
     private Nodes[] array_of_nodes;
-    private int source;
+    private int serverNum;
     private Thread t = null;
+    private int parent;
 
     //initialize socket and input/output stream
     private ServerSocket server = null;
@@ -23,9 +24,9 @@ public class Server extends Thread {
     String ackMsg = "ACK";
     String nackMsg = "NACK";
 
-    Server (Nodes[] array_of_nodes, int source) {
+    Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
-        this.source = source;
+        this.serverNum = serverNum;
     }
 
     public void start () {
@@ -38,21 +39,20 @@ public class Server extends Thread {
     // constructor with port
     public void run() {
         boolean finished = false;
-            int port = this.array_of_nodes[source].getPortNumber();
+            int serverPort = this.array_of_nodes[serverNum].getPortNumber();
+            String serverHostname = this.array_of_nodes[serverNum].getHostName();
             // starts server and waits for a connection
             try {
-                server = new ServerSocket(port);
-                System.out.println("Server: Started at Host: " + this.array_of_nodes[source].getHostName() + " Port: " + port);
+                server = new ServerSocket(serverPort);
+                System.out.println("Server: Started at Host: " + serverHostname + " Port: " + serverPort);
                 Thread.sleep(2000);
-                if (source == 1) {
-                    array_of_nodes[source].setDiscovered(true);
+                if (serverNum == 1) {
+                    array_of_nodes[serverNum].setDiscovered(true);
                     //send to all children ie neighbours
-                    for (int i = 0; i < array_of_nodes[source].getNodalConnections().size(); i++) {
-                        String hostName = array_of_nodes[array_of_nodes[source].getNodalConnections().get(i)].getHostName();
-                        int portNum = array_of_nodes[array_of_nodes[source].getNodalConnections().get(i)].getPortNumber();
-                        int dest = array_of_nodes[source].getNodalConnections().get(i);
+                    for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
+                        int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
                         Packet packet = new Packet();
-                        packet.buildPacket(array_of_nodes[source].getNodeID(), array_of_nodes[dest].getNodeID(), reqMsg);
+                        packet.buildPacket(array_of_nodes[serverNum].getNodeID(), array_of_nodes[dest].getNodeID(), reqMsg);
                         System.out.println("Client: Packet to be sent: " + packet);
                         outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
                         out = new ObjectOutputStream(outSocket.getOutputStream());
@@ -77,29 +77,34 @@ public class Server extends Thread {
                     String msg = packet.getMsg();
 
                     //if flag == 0
-                    if (!(array_of_nodes[source].getDiscovered())) {
-                        //return ack
-                        packet = new Packet();
-                        packet.buildPacket(dest, source, ackMsg);
-                        outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
-                        out = new ObjectOutputStream(outSocket.getOutputStream());
-                        out.writeObject(packet);
-                        out.flush();
-                        out.close();
-                        outSocket.close();
-                        
-                        //mark own flag and remember parent
-                        array_of_nodes[source].setDiscovered(true);
-                    } else if (array_of_nodes[source].getDiscovered()) {
-                        //send nack
-                        packet = new Packet();
-                        packet.buildPacket(dest, source, nackMsg);
-                        outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
-                        out = new ObjectOutputStream(outSocket.getOutputStream());
-                        out.writeObject(packet);
-                        out.flush();
-                        out.close();
-                        outSocket.close();
+                    if (msg == reqMsg) {
+                        if (!(array_of_nodes[source].getDiscovered())) {
+                            //return ack
+                            packet = new Packet();
+                            packet.buildPacket(dest, source, ackMsg);
+                            outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                            out = new ObjectOutputStream(outSocket.getOutputStream());
+                            out.writeObject(packet);
+                            out.flush();
+                            out.close();
+                            outSocket.close();
+                            
+                            //mark own flag and remember parent
+                            array_of_nodes[source].setDiscovered(true);
+                            parent = source;
+                        } else if (array_of_nodes[source].getDiscovered()) {
+                            //send nack
+                            packet = new Packet();
+                            packet.buildPacket(dest, source, nackMsg);
+                            outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                            out = new ObjectOutputStream(outSocket.getOutputStream());
+                            out.writeObject(packet);
+                            out.flush();
+                            out.close();
+                            outSocket.close();
+                        }
+                    } else if (msg != reqMsg) {
+
                     }
                 }
                 /*while (!finished) {

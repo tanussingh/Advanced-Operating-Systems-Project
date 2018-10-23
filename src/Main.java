@@ -28,8 +28,6 @@ public class Main {
             e.printStackTrace();
         }
 
-        System.out.println(source);
-
         //create server
         Server server = new Server(array_of_nodes, source);
         server.start();
