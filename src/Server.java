@@ -10,7 +10,6 @@ public class Server extends Thread {
     private Nodes[] array_of_nodes;
     private int serverNum;
     private Thread t = null;
-    private int parent;
 
     //initialize socket and input/output stream
     private ServerSocket server = null;
@@ -44,7 +43,7 @@ public class Server extends Thread {
             // starts server and waits for a connection
             try {
                 server = new ServerSocket(serverPort);
-                System.out.println("Server: Started at Host: " + serverHostname + " Port: " + serverPort);
+                System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
                 Thread.sleep(2000);
                 if (serverNum == 1) {
                     array_of_nodes[serverNum].setDiscovered(true);
@@ -52,8 +51,8 @@ public class Server extends Thread {
                     for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
                         int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
                         Packet packet = new Packet();
-                        packet.buildPacket(array_of_nodes[serverNum].getNodeID(), array_of_nodes[dest].getNodeID(), reqMsg);
-                        System.out.println("Client: Packet to be sent: " + packet);
+                        packet.buildPacket(serverNum, reqMsg);
+                        System.out.println("Packet to be sent: " + packet + ", to: " + dest);
                         outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
                         out = new ObjectOutputStream(outSocket.getOutputStream());
                         out.writeObject(packet);
@@ -72,17 +71,16 @@ public class Server extends Thread {
                     in.close();
 
                     //get info out of msg
-                    int source = packet.getSourceId();
-                    int dest = packet.getDestId();
+                    int dest = packet.getSourceId();
                     String msg = packet.getMsg();
 
                     //if flag == 0
                     if (msg == reqMsg) {
-                        if (!(array_of_nodes[source].getDiscovered())) {
+                        if (!(array_of_nodes[dest].getDiscovered())) {
                             //return ack
                             packet = new Packet();
-                            packet.buildPacket(dest, source, ackMsg);
-                            outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                            packet.buildPacket(serverNum, ackMsg);
+                            outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
                             out = new ObjectOutputStream(outSocket.getOutputStream());
                             out.writeObject(packet);
                             out.flush();
@@ -90,21 +88,31 @@ public class Server extends Thread {
                             outSocket.close();
                             
                             //mark own flag and remember parent
-                            array_of_nodes[source].setDiscovered(true);
-                            parent = source;
-                        } else if (array_of_nodes[source].getDiscovered()) {
+                            array_of_nodes[serverNum].setDiscovered(true);
+                            array_of_nodes[serverNum].setParent(dest);
+                            System.out.println("Send ACK to: " + dest + ". Discovered Set!, Parent Set! for server: " + serverNum);
+                        } else if (array_of_nodes[dest].getDiscovered()) {
                             //send nack
                             packet = new Packet();
-                            packet.buildPacket(dest, source, nackMsg);
-                            outSocket = new Socket(array_of_nodes[source].getHostName(), array_of_nodes[source].getPortNumber());
+                            packet.buildPacket(serverNum, nackMsg);
+                            outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
                             out = new ObjectOutputStream(outSocket.getOutputStream());
                             out.writeObject(packet);
                             out.flush();
                             out.close();
                             outSocket.close();
+                            System.out.println("Send NACK to: " + dest + ". For server: " + serverNum);
                         }
                     } else if (msg != reqMsg) {
-
+                        if (msg == ackMsg) {
+                            //here dest is source number. Cool? Cool
+                            array_of_nodes[serverNum].addChild(dest);
+                            System.out.println("Recieved ACK from: " + dest + ". For server: " + serverNum);
+                            System.out.println("New child: " + dest + ", added to: " + serverNum);
+                        } else if (msg == nackMsg) {
+                            //do nothing with it
+                            System.out.println("Recieved NACK from: " + dest + ". For server: " + serverNum);
+                        }
                     }
                 }
                 /*while (!finished) {

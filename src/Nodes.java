@@ -6,6 +6,8 @@ public class Nodes {
     private int portNumber;
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
+    private int parent = null;
+    private ArrayList<Integer> children = new ArrayList<Integer>();
 
     public void setNodeID(int i) {
         this.nodeID = i;
@@ -26,6 +28,14 @@ public class Nodes {
     public void setDiscovered(boolean value){
         this.discovered = value;
     }
+
+    public void setParent(int parent) {
+        this.parent = parent;
+    }
+
+    public void addChild(int child) {
+        this.children.add(child);
+    }
     
     public int getNodeID() {
         return this.nodeID;
@@ -43,7 +53,15 @@ public class Nodes {
         return this.nodalConnections;
     }
 
-    public boolean getDiscovered(){
+    public boolean getDiscovered() {
         return this.discovered;
+    }
+
+    public int getParent() {
+        return this.parent;
+    }
+
+    public ArrayList<Integer> getChildren() {
+        return this.children;
     }
 }
