@@ -8,7 +8,7 @@ Instructions to compile and run:
 1. cd IdeaProjects/Project-1/
 2. scp -r ./src tts150030@dc02.utdallas.edu:./CS6378/Project-2/
 3. ssh tts150030@dc02.utdallas.edu
-4. cd /CS6378/Project-1/src
+4. cd /CS6378/Project-2/src
 5. javac *.java
 6. exit
 7. ./launcher.sh

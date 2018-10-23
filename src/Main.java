@@ -9,8 +9,8 @@ public class Main {
     public static void main(String[] args) {
         //parse config file
         String PATH = System.getProperty("user.dir");
-        PATH = PATH + "/CS6378/Project-1/src/config_file.txt";
-        Nodes[] array_of_nodes = Parser.parse("./config_file.txt");
+        PATH = PATH + "/CS6378/Project-2/src/config_file.txt";
+        Nodes[] array_of_nodes = Parser.parse(PATH);
 
         //figure out which machine this is
         int source = -1;
@@ -27,6 +27,8 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println(source);
 
         //create server
         Server server = new Server(array_of_nodes, source);
