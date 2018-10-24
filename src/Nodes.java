@@ -6,7 +6,7 @@ public class Nodes {
     private int portNumber;
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
-    private int parent = null;
+    private int parent = -1;
     private ArrayList<Integer> children = new ArrayList<Integer>();
 
     public void setNodeID(int i) {
