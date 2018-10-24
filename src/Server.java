@@ -10,7 +10,7 @@ public class Server extends Thread {
     private Nodes[] array_of_nodes;
     private int serverNum;
     private Thread t = null;
-    private expectedReplies = -1;
+    private int expectedReplies = -1;
 
     //initialize socket and input/output stream
     private ServerSocket server = null;
@@ -46,13 +46,14 @@ public class Server extends Thread {
                 server = new ServerSocket(serverPort);
                 System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
                 //ONLY SERVER 1 RUNS THIS IF BLOCK OF CODE
+                Packet packet;
                 if (serverNum == 1) {
                     Thread.sleep(3000);
                     array_of_nodes[serverNum].setDiscovered(true);
                     //send to all children ie neighbours
                     for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
                         int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
-                        Packet packet = new Packet();
+                        packet = new Packet();
                         packet.buildPacket(serverNum, reqMsg);
                         System.out.println("Packet to be sent: " + packet + ", to: " + dest);
                         outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
@@ -69,7 +70,7 @@ public class Server extends Thread {
                     inSocket = server.accept();
                     System.out.println("Server: Client accepted");
                     in = new ObjectInputStream(inSocket.getInputStream());
-                    Packet packet = (Packet) in.readObject();
+                    packet = (Packet) in.readObject();
                     System.out.println("Server: Packet Received - " + packet);
                     in.close();
 
@@ -85,13 +86,13 @@ public class Server extends Thread {
                                 //set myself to discovered and remember parent
                                 array_of_nodes[serverNum].setDiscovered(true);
                                 array_of_nodes[serverNum].setParent(dest);
-                                System.out.println("Discovered Set!, Parent Set for server: ", serverNum);
+                                System.out.println("Discovered Set!, Parent Set for server: " + serverNum);
 
                                 //send out req to my neighbours
                                 for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
-                                    int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
+                                    dest = array_of_nodes[serverNum].getNodalConnections().get(i);
                                     if (dest != array_of_nodes[serverNum].getParent()) {
-                                        Packet packet = new Packet();
+                                        packet = new Packet();
                                         packet.buildPacket(serverNum, reqMsg);
                                         System.out.println("Packet to be sent: " + packet + ", to: " + dest);
                                         outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
