@@ -34,7 +34,6 @@ public class Server extends Thread {
         //starts server and waits for a connection
         //this block of try is fro tree building
         try {
-            System.out.println("prints twice?" + serverPort);
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             //ONLY SERVER 1 RUNS THIS IF BLOCK OF CODE
