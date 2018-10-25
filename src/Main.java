@@ -20,18 +20,15 @@ public class Main {
                 /*line for testing
                 thisHostName = "dc01.utdallas.edu";*/
                 //end testing line
-                if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
-                    source = i;
+                if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())) {
+                    //create server
+                    Server server = new Server(array_of_nodes, i);
+                    server.start();
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-
-
-        //create server
-        Server server = new Server(array_of_nodes, source);
-        server.start();
     }
 }
