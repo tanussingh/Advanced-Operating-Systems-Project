@@ -36,11 +36,11 @@ public class Server extends Thread {
         }
     }
 
-    // constructor with port
     public void run() {
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
-        // starts server and waits for a connection
+        //starts server and waits for a connection
+        //this block of try is fro tree building
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
@@ -65,6 +65,7 @@ public class Server extends Thread {
                     expectedReplies += 1;
                 }
             }
+            //once server 1 completes, all server is at this stage
             do {
                 System.out.println("Server: Waiting for a client ...");
                 inSocket = server.accept();
@@ -78,10 +79,10 @@ public class Server extends Thread {
                 int dest = packet.getSourceId();
                 String msg = packet.getMsg();
 
-                //if flag == 0
+                //if it is a request message
                 if (msg.equals(reqMsg)) {
                     if (!(array_of_nodes[serverNum].getDiscovered())) {
-                        //set myself to discovered and remember parent
+                        //if this server is not already discovered, set myself to discovered and remember parent
                         array_of_nodes[serverNum].setDiscovered(true);
                         array_of_nodes[serverNum].setParent(dest);
                         System.out.println("Discovered Set!, Parent Set for server: " + serverNum);
@@ -102,8 +103,9 @@ public class Server extends Thread {
                                 expectedReplies += 1;
                             }
                         }
+                    
                     } else if (array_of_nodes[serverNum].getDiscovered()) {
-                        //send nack
+                        //if this server is already discovered, send nack
                         packet = new Packet();
                         packet.buildPacket(serverNum, nackMsg);
                         outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
@@ -115,18 +117,20 @@ public class Server extends Thread {
                         System.out.println("Send NACK to: " + dest + ". For server: " + serverNum);
                     }
                 } else if (!msg.equals(reqMsg)) {
+                    //if it is a ack or nack message
                     expectedReplies -= 1;
                     if (msg.equals(ackMsg)) {
-                        //here dest is source number. Cool? Cool
+                        //if message is ack, add message source to child list
                         array_of_nodes[serverNum].addChild(dest);
                         System.out.println("Recieved ACK from: " + dest + ". For server: " + serverNum);
                         System.out.println("New child: " + dest + ", added to: " + serverNum);
                     } else if (msg.equals(nackMsg)) {
-                        //do nothing with it
+                        //if message is nack, do nothing with it
                         System.out.println("Recieved NACK from: " + dest + ". For server: " + serverNum);
                     }
                 }
             } while (expectedReplies != 0);
+
             //send ack back to parent
             System.out.print("LOOKING FOR THIS LINE PLEASE");
             packet = new Packet();
@@ -139,7 +143,7 @@ public class Server extends Thread {
             outSocket.close();
             System.out.println("Send ACK to parent: " + array_of_nodes[serverNum].getParent() + ". For server: " + serverNum);
 
-            in.close();
+            //close all ports and servers so it can start new in another try block for broadcasting
             inSocket.close();
             server.close();
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
@@ -149,7 +153,7 @@ public class Server extends Thread {
         //print tree neighbours
         System.out.println("Parent = " + array_of_nodes[serverNum].getParent() + ", Children = " + array_of_nodes[serverNum].getChildren());
 
-        //broadcast
+        //broadcast try block
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
