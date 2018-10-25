@@ -124,7 +124,6 @@ public class Server extends Thread {
             } while (expectedReplies != 0);
 
             //send ack back to parent
-            System.out.print("LOOKING FOR THIS LINE PLEASE");
             packet = new Packet();
             packet.buildPacket(serverNum, ackMsg);
             outSocket = new Socket(array_of_nodes[array_of_nodes[serverNum].getParent()].getHostName(), array_of_nodes[array_of_nodes[serverNum].getParent()].getPortNumber());
