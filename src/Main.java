@@ -4,30 +4,17 @@
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Objects;
+import java.lang.Integer;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println();
         //parse config file
         String PATH = System.getProperty("user.dir");
         PATH = PATH + "/CS6378/Project-2/src/config_file.txt";
         Nodes[] array_of_nodes = Parser.parse(PATH);
 
-        //figure out which machine this is
-        try {
-            String thisHostName = InetAddress.getLocalHost().getHostName();
-            for (int i = 1; i < array_of_nodes.length; i++) {
-                /*line for testing
-                thisHostName = "dc01.utdallas.edu";*/
-                //end testing line
-                if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())) {
-                    //create server
-                    Server server = new Server(array_of_nodes, i);
-                    server.start();
-                }
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        //start server with array_of_nodes[args[0]], args[0] is passed in through launcher.sh
+        Server server = new Server(array_of_nodes, Integer.parseInt(args[0]));
     }
 }

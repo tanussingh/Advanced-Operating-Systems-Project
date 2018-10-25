@@ -6,7 +6,7 @@ public class Server extends Thread {
     //set up variables
     private Nodes[] array_of_nodes;
     private int serverNum;
-    private Thread t = null;
+    //private Thread t = new Thread();
     private int expectedReplies = 0;
 
     //initialize socket and input/output stream
@@ -24,13 +24,8 @@ public class Server extends Thread {
     Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
         this.serverNum = serverNum;
-    }
-
-    public void start () {
-        if (t == null) {
-            t = new Thread(this);
-            t.start();
-        }
+        Thread t = new Thread(this);
+        t.start();
     }
 
     public void run() {
@@ -40,6 +35,7 @@ public class Server extends Thread {
         //starts server and waits for a connection
         //this block of try is fro tree building
         try {
+            System.out.println("prints twice?" + serverPort);
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             //ONLY SERVER 1 RUNS THIS IF BLOCK OF CODE
