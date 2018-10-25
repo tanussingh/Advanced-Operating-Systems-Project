@@ -153,6 +153,7 @@ public class Server extends Thread {
 
         //broadcast to every node
         try {
+            boolean finished = false;
             server = new ServerSocket(serverPort);
             Packet packet;
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
@@ -172,7 +173,7 @@ public class Server extends Thread {
                 }
             }
 
-            do {
+            while (!finished) {
                 System.out.println("Server: Waiting for a messages ...");
                 inSocket = server.accept();
                 System.out.println("Server: Packet received!");
@@ -185,7 +186,7 @@ public class Server extends Thread {
                 int dest = packet.getSourceId();
                 String msg = packet.getMsg();
 
-                //send out req to my neighbours
+                //send out message to my children
                 for (int i = 0; i < array_of_nodes[serverNum].getChildren().size(); i++) {
                     dest = array_of_nodes[serverNum].getChildren().get(i);
                     if (dest != array_of_nodes[serverNum].getParent()) {
@@ -200,8 +201,7 @@ public class Server extends Thread {
                         outSocket.close();
                     }
                 }
-            } while (expectedReplies != 0);
-
+            }
 
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
