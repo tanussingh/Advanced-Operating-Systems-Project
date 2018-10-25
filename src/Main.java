@@ -17,8 +17,8 @@ public class Main {
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 1; i < array_of_nodes.length; i++) {
-                //line for testing
-                thisHostName = "dc01.utdallas.edu";
+                /*line for testing
+                thisHostName = "dc01.utdallas.edu";*/
                 //end testing line
                 if (Objects.equals(thisHostName, array_of_nodes[i].getHostName())){
                     source = i;
@@ -27,6 +27,8 @@ public class Main {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+
 
         //create server
         Server server = new Server(array_of_nodes, source);
