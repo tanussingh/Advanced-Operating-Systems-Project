@@ -39,6 +39,7 @@ public class Server extends Thread {
     public void run() {
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
+
         //starts server and waits for a connection
         //this block of try is fro tree building
         try {
@@ -65,6 +66,7 @@ public class Server extends Thread {
                     expectedReplies += 1;
                 }
             }
+
             //once server 1 completes, all server is at this stage
             do {
                 System.out.println("Server: Waiting for a client ...");
@@ -129,6 +131,7 @@ public class Server extends Thread {
                     }
                 }
             } while (expectedReplies != 0);
+
             //send ack back to parent
             System.out.print("LOOKING FOR THIS LINE PLEASE");
             packet = new Packet();
@@ -202,7 +205,6 @@ public class Server extends Thread {
                     }
                 }
             }
-
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
