@@ -6,7 +6,6 @@ public class Server extends Thread {
     //set up variables
     private Nodes[] array_of_nodes;
     private int serverNum;
-    //private Thread t = new Thread();
     private int expectedReplies = 0;
 
     //initialize socket and input/output stream
