@@ -1,17 +1,12 @@
 import java.util.ArrayList;
 
 public class Nodes {
-    private int nodeID;
     private String hostName;
     private int portNumber;
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
     private int parent = -1;
     private ArrayList<Integer> children = new ArrayList<Integer>();
-
-    public void setNodeID(int i) {
-        this.nodeID = i;
-    }
 
     public void setHostName(String i) {
         this.hostName = i;
@@ -35,10 +30,6 @@ public class Nodes {
 
     public void addChild(int child) {
         this.children.add(child);
-    }
-    
-    public int getNodeID() {
-        return this.nodeID;
     }
 
     public String getHostName() {

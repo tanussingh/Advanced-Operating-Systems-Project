@@ -1,9 +1,6 @@
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
 
 public class Server extends Thread {
     //set up variables
@@ -123,11 +120,11 @@ public class Server extends Thread {
                     if (msg.equals(ackMsg)) {
                         //if message is ack, add message source to child list
                         array_of_nodes[serverNum].addChild(dest);
-                        System.out.println("Recieved ACK from: " + dest + ". For server: " + serverNum);
+                        System.out.println("Received ACK from: " + dest + ". For server: " + serverNum);
                         System.out.println("New child: " + dest + ", added to: " + serverNum);
                     } else if (msg.equals(nackMsg)) {
                         //if message is nack, do nothing with it
-                        System.out.println("Recieved NACK from: " + dest + ". For server: " + serverNum);
+                        System.out.println("Received NACK from: " + dest + ". For server: " + serverNum);
                     }
                 }
             } while (expectedReplies != 0);
@@ -186,12 +183,11 @@ public class Server extends Thread {
                 in.close();
 
                 //get info out of msg
-                int dest = packet.getSourceId();
                 String msg = packet.getMsg();
 
                 //send out message to my children
                 for (int i = 0; i < array_of_nodes[serverNum].getChildren().size(); i++) {
-                    dest = array_of_nodes[serverNum].getChildren().get(i);
+                    int dest = array_of_nodes[serverNum].getChildren().get(i);
                     if (dest != array_of_nodes[serverNum].getParent()) {
                         packet = new Packet();
                         packet.buildPacket(serverNum, msg);

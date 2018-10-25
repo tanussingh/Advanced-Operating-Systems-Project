@@ -1,5 +1,4 @@
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class Packet implements Serializable {
     private int sourceId;
@@ -7,14 +6,6 @@ public class Packet implements Serializable {
 
     public void buildPacket(int sourceId, String msg) {
         this.sourceId = sourceId;
-        this.msg = msg;
-    }
-
-    public void setSourceId (int i) {
-        this.sourceId = i;
-    }
-
-    public void setMsg (String msg) {
         this.msg = msg;
     }
 

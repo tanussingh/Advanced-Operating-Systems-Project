@@ -1,10 +1,8 @@
 import java.io.*;
-import java.util.ArrayList;
 
 public class Parser {
     public static Nodes[] parse (String PATH) {
         File file = new File(PATH);
-        FileReader fileReader = null;
         BufferedReader bufferedReader = null;
         int numNode = 0;
         boolean found = false;
@@ -15,7 +13,7 @@ public class Parser {
         //read numNode
         try {
             //open file
-            fileReader = new FileReader(file);
+            FileReader fileReader = new FileReader(file);
             bufferedReader = new BufferedReader(fileReader);
             
             //get numNodes
@@ -42,7 +40,7 @@ public class Parser {
             e.printStackTrace();
         }
 
-        //populate node infomation
+        //populate node information
         Nodes[] array_of_nodes = new Nodes[numNode + 1];
         try {
             int valid_lines = 1;
@@ -62,7 +60,6 @@ public class Parser {
                 if (!empty) {
                     //parse info
                     Nodes node = new Nodes();
-                    node.setNodeID(valid_lines);
                     index = line.indexOf(" ");
                     node.setHostName(line.substring(0, index) + ".utdallas.edu");
                     line = line.substring(index).trim();

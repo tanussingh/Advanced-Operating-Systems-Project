@@ -13,7 +13,6 @@ public class Main {
         Nodes[] array_of_nodes = Parser.parse(PATH);
 
         //figure out which machine this is
-        int source = -1;
         try {
             String thisHostName = InetAddress.getLocalHost().getHostName();
             for (int i = 1; i < array_of_nodes.length; i++) {
