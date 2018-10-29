@@ -4,29 +4,8 @@ import java.net.Socket;
 
 public class Server extends Thread {
     //set up variables
-    int messagesToSend = 5;
     private Nodes[] array_of_nodes;
     private int serverNum;
-    private int expectedReplies = 0;
-    //private int[][] records = new int[array_of_nodes.length - 1][3];
-    private int parent = -1;
-    /*
-    source
-    node
-    waiting
-     */
-
-    //initialize socket and input/output stream
-    private ServerSocket server = null;
-    private Socket inSocket = null;
-    private Socket outSocket = null;
-    private ObjectInputStream in = null;
-    private ObjectOutputStream out = null;
-
-    //Set up messages
-    String reqMsg = "REQ";
-    String ackMsg = "ACK";
-    String nackMsg = "NACK";
 
     Server (Nodes[] array_of_nodes, int serverNum) {
         this.array_of_nodes = array_of_nodes;
@@ -36,8 +15,29 @@ public class Server extends Thread {
     }
 
     public void run() {
+        //initialize socket and input/output stream
+        ServerSocket server = null;
+        Socket inSocket = null;
+        Socket outSocket = null;
+        ObjectInputStream in = null;
+        ObjectOutputStream out = null;
+
+        //Set up messages
+        String reqMsg = "REQ";
+        String ackMsg = "ACK";
+        String nackMsg = "NACK";
+
+        //set up variables
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
+        int expectedReplies = 0;
+        int parent = -1;
+        //int[][] records = new int[array_of_nodes.length - 1][2];
+        /*
+        source
+        node
+        waiting
+         */
 
         //starts server and waits for a connection
         //this block of try is fro tree building
@@ -154,9 +154,39 @@ public class Server extends Thread {
             array_of_nodes[serverNum].addTreeNeighbours(parent);
         }
         System.out.println("Server = " + serverNum + ", Tree Neighbours = " + array_of_nodes[serverNum].getTreeNeighbours());
+        System.out.println("--------------------------------------SPANNING TREE DONE--------------------------------------");
 
         //broadcast to every node
+        //int messagesToSend = 5;
         /*try {
+            server = new ServerSocket(serverPort);
+            System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
+            Thread.sleep(3000);
+
+            Packet packet;
+            for (int j = 0; j < messagesToSend; j++) {
+                for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                    int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                    packet = new Packet();
+                    packet.buildPacket(serverNum, "Hello");
+                    packet.setBroadcastNode(serverNum);
+                    System.out.println("Packet to be sent: " + packet + ", to: " + dest);
+                    outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
+                    out = new ObjectOutputStream(outSocket.getOutputStream());
+                    out.writeObject(packet);
+                    out.flush();
+                    out.close();
+                    outSocket.close();
+                }
+
+                while ()
+
+            }
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        //delete try block
+        try {
             boolean finished = false;
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
