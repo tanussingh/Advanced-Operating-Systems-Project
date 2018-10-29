@@ -5,8 +5,7 @@ public class Nodes {
     private int portNumber;
     private ArrayList<Integer> nodalConnections = new ArrayList<Integer>();
     private boolean discovered = false;
-    private int parent = -1;
-    private ArrayList<Integer> children = new ArrayList<Integer>();
+    private ArrayList<Integer> treeNeighbours = new ArrayList<Integer>();
 
     public void setHostName(String i) {
         this.hostName = i;
@@ -24,12 +23,8 @@ public class Nodes {
         this.discovered = value;
     }
 
-    public void setParent(int parent) {
-        this.parent = parent;
-    }
-
-    public void addChild(int child) {
-        this.children.add(child);
+    public void addTreeNeighbours(int num) {
+        this.treeNeighbours.add(num);
     }
 
     public String getHostName() {
@@ -48,11 +43,7 @@ public class Nodes {
         return this.discovered;
     }
 
-    public int getParent() {
-        return this.parent;
-    }
-
-    public ArrayList<Integer> getChildren() {
-        return this.children;
+    public ArrayList<Integer> getTreeNeighbours() {
+        return this.treeNeighbours;
     }
 }

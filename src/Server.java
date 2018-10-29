@@ -4,9 +4,17 @@ import java.net.Socket;
 
 public class Server extends Thread {
     //set up variables
+    int messagesToSend = 5;
     private Nodes[] array_of_nodes;
     private int serverNum;
     private int expectedReplies = 0;
+    //private int[][] records = new int[array_of_nodes.length - 1][3];
+    private int parent = -1;
+    /*
+    source
+    node
+    waiting
+     */
 
     //initialize socket and input/output stream
     private ServerSocket server = null;
@@ -41,7 +49,7 @@ public class Server extends Thread {
             if (serverNum == 1) {
                 Thread.sleep(3000);
                 array_of_nodes[serverNum].setDiscovered(true);
-                array_of_nodes[serverNum].setParent(serverNum);
+                parent = serverNum;
                 //send to all children ie neighbours
                 for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
                     int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
@@ -77,13 +85,13 @@ public class Server extends Thread {
                     if (!(array_of_nodes[serverNum].getDiscovered())) {
                         //if this server is not already discovered, set myself to discovered and remember parent
                         array_of_nodes[serverNum].setDiscovered(true);
-                        array_of_nodes[serverNum].setParent(dest);
+                        parent = dest;
                         System.out.println("Discovered Set!, Parent Set for server: " + serverNum);
 
                         //send out req to my neighbours
                         for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
                             dest = array_of_nodes[serverNum].getNodalConnections().get(i);
-                            if (dest != array_of_nodes[serverNum].getParent()) {
+                            if (dest != parent) {
                                 packet = new Packet();
                                 packet.buildPacket(serverNum, reqMsg);
                                 System.out.println("Packet to be sent: " + packet + ", to: " + dest);
@@ -113,7 +121,7 @@ public class Server extends Thread {
                     expectedReplies -= 1;
                     if (msg.equals(ackMsg)) {
                         //if message is ack, add message source to child list
-                        array_of_nodes[serverNum].addChild(dest);
+                        array_of_nodes[serverNum].addTreeNeighbours(dest);
                         System.out.println("Received ACK from: " + dest + ". For server: " + serverNum);
                         System.out.println("New child: " + dest + ", added to: " + serverNum);
                     } else if (msg.equals(nackMsg)) {
@@ -126,13 +134,13 @@ public class Server extends Thread {
             //send ack back to parent
             packet = new Packet();
             packet.buildPacket(serverNum, ackMsg);
-            outSocket = new Socket(array_of_nodes[array_of_nodes[serverNum].getParent()].getHostName(), array_of_nodes[array_of_nodes[serverNum].getParent()].getPortNumber());
+            outSocket = new Socket(array_of_nodes[parent].getHostName(), array_of_nodes[parent].getPortNumber());
             out = new ObjectOutputStream(outSocket.getOutputStream());
             out.writeObject(packet);
             out.flush();
             out.close();
             outSocket.close();
-            System.out.println("Send ACK to parent: " + array_of_nodes[serverNum].getParent() + ". For server: " + serverNum);
+            System.out.println("Send ACK to parent: " + parent + ". For server: " + serverNum);
 
             //close all ports and servers so it can start new in another try block for broadcasting
             inSocket.close();
@@ -142,28 +150,28 @@ public class Server extends Thread {
         }
 
         //print tree neighbours
-        System.out.println("Parent = " + array_of_nodes[serverNum].getParent() + ", Children = " + array_of_nodes[serverNum].getChildren());
+        array_of_nodes[serverNum].addTreeNeighbours(parent);
+        System.out.println("Server = " + serverNum + ", Tree Neighbours = " + array_of_nodes[serverNum].getTreeNeighbours());
 
         //broadcast to every node
-        try {
+        /*try {
             boolean finished = false;
             server = new ServerSocket(serverPort);
-            Packet packet;
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             Thread.sleep(3000);
-            if (serverNum == 1) {
-                for (int i = 0; i < array_of_nodes[serverNum].getChildren().size(); i++) {
-                    int dest = array_of_nodes[serverNum].getChildren().get(i);
-                    packet = new Packet();
-                    packet.buildPacket(serverNum, "Hello");
-                    System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                    outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                    out = new ObjectOutputStream(outSocket.getOutputStream());
-                    out.writeObject(packet);
-                    out.flush();
-                    out.close();
-                    outSocket.close();
-                }
+
+            Packet packet;
+            for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                packet = new Packet();
+                packet.buildPacket(serverNum, "Hello");
+                System.out.println("Packet to be sent: " + packet + ", to: " + dest);
+                outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
+                out = new ObjectOutputStream(outSocket.getOutputStream());
+                out.writeObject(packet);
+                out.flush();
+                out.close();
+                outSocket.close();
             }
 
             while (!finished) {
@@ -179,9 +187,9 @@ public class Server extends Thread {
                 String msg = packet.getMsg();
 
                 //send out message to my children
-                for (int i = 0; i < array_of_nodes[serverNum].getChildren().size(); i++) {
-                    int dest = array_of_nodes[serverNum].getChildren().get(i);
-                    if (dest != array_of_nodes[serverNum].getParent()) {
+                for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                    int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                    if (dest != parent) {
                         packet = new Packet();
                         packet.buildPacket(serverNum, msg);
                         System.out.println("Packet to be sent: " + packet + ", to: " + dest);
@@ -196,6 +204,6 @@ public class Server extends Thread {
             }
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }
