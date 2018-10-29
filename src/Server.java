@@ -150,7 +150,9 @@ public class Server extends Thread {
         }
 
         //print tree neighbours
-        array_of_nodes[serverNum].addTreeNeighbours(parent);
+        if (parent != serverNum){
+            array_of_nodes[serverNum].addTreeNeighbours(parent);
+        }
         System.out.println("Server = " + serverNum + ", Tree Neighbours = " + array_of_nodes[serverNum].getTreeNeighbours());
 
         //broadcast to every node
