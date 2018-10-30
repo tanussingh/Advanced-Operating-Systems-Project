@@ -156,12 +156,19 @@ public class Server extends Thread {
             do {
                 Packet packet;
                 //sends messagesToSend messages
-                if (records[serverNum][1] == 0 && messagesToSend > 0) {
-                    //sends to all tree neighbours
-                    for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                        int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                        sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
-                        records[serverNum][1] += 1;
+                if (records[serverNum][1] == 0 && messagesToSend >= 0) {
+                    if (records[serverNum][1] == 0 && messagesToSend != 5){
+                        System.out.println();
+                        System.out.println("SOURCE HAS RECEIVED ACKNOWLEDGMENT THAT ITS MESSAGE HAS BEEN BROADCASTED!");
+                        System.out.println();
+                    }
+                    if (messagesToSend != 0) {
+                        //sends to all tree neighbours
+                        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                            int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                            sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
+                            records[serverNum][1] += 1;
+                        }
                     }
                     messagesToSend--;
                 }
