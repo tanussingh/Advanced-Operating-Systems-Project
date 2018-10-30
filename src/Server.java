@@ -146,20 +146,22 @@ public class Server extends Thread {
         }
 
         //broadcast to every node
-        int messagesToSend = 5;
+        int messagesToSend = 100;
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             Thread.sleep(3000);
             boolean finished = false;
+            int counter = 1;
 
             do {
                 Packet packet;
                 //sends messagesToSend messages
                 if (records[serverNum][1] == 0 && messagesToSend >= 0) {
-                    if (records[serverNum][1] == 0 && messagesToSend != 5){
+                    if (records[serverNum][1] == 0 && messagesToSend != 100){
                         System.out.println();
-                        System.out.println("SOURCE HAS RECEIVED ACKNOWLEDGMENT THAT ITS MESSAGE HAS BEEN BROADCASTED!");
+                        System.out.println("SOURCE HAS RECEIVED " + counter + " ACKNOWLEDGMENTS THAT ITS MESSAGE HAS BEEN BROADCASTED!");
+                        counter++;
                         System.out.println();
                     }
                     if (messagesToSend != 0) {
