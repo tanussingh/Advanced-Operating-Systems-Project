@@ -151,57 +151,60 @@ public class Server extends Thread {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             Thread.sleep(3000);
+            boolean finished = false;
 
-            Packet packet;
-            //sends messagesToSend messages
-            for (int j = 0; j < messagesToSend; j++) {
-                //sends to all tree neighbours
-                for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                    int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                    sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
-                    records[serverNum][1] += 1;
+            do {
+                Packet packet;
+                //sends messagesToSend messages
+                if (records[serverNum][1] == 0 && messagesToSend > 0) {
+                    //sends to all tree neighbours
+                    for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                        int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                        sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
+                        records[serverNum][1] += 1;
+                    }
+                    messagesToSend--;
                 }
 
-                do {
-                    System.out.println("Server: Waiting for a messages ...");
-                    inSocket = server.accept();
-                    System.out.println("Server: Packet received!");
-                    in = new ObjectInputStream(inSocket.getInputStream());
-                    packet = (Packet) in.readObject();
-                    System.out.println("Server: Packet Received - " + packet);
-                    in.close();
+                System.out.println("Server: Waiting for a messages ...");
+                inSocket = server.accept();
+                System.out.println("Server: Packet received!");
+                in = new ObjectInputStream(inSocket.getInputStream());
+                packet = (Packet) in.readObject();
+                System.out.println("Server: Packet Received - " + packet);
+                in.close();
 
-                    //get info out of msg
-                    int broadcastSource = packet.getBroadcastNode();
-                    int source = packet.getSourceId();
-                    String msg = packet.getMsg();
+                //get info out of msg
+                int broadcastSource = packet.getBroadcastNode();
+                int source = packet.getSourceId();
+                String msg = packet.getMsg();
 
-                    //if record at broadcastSource == 0 then it means its a new message
-                    if (!msg.equals(ackMsg)) {
-                        records[broadcastSource][0] = source;
-                        if (array_of_nodes[serverNum].getTreeNeighbours().size() == 1) {
-                            //send ack back to source if neighbour list is 1
-                            sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, source);
-                        } else {
-                            //continue broadcast message
-                            for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                                int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                                if (dest != source) {
-                                    sendPacket(outSocket, out, broadcastSource, serverNum, msg, dest);
-                                    records[broadcastSource][1] += 1;
-                                }
+                //if record at broadcastSource == 0 then it means its a new message
+                if (!msg.equals(ackMsg)) {
+                    records[broadcastSource][0] = source;
+                    if (array_of_nodes[serverNum].getTreeNeighbours().size() == 1) {
+                        //send ack back to source if neighbour list is 1
+                        sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, source);
+                    } else {
+                        //continue broadcast message
+                        for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                            int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                            if (dest != source) {
+                                sendPacket(outSocket, out, broadcastSource, serverNum, msg, dest);
+                                records[broadcastSource][1] += 1;
                             }
                         }
-                    } else if (msg.equals(ackMsg)) {
-                        records[broadcastSource][1] -= 1;
-                        if (records[broadcastSource][1] == 0 && broadcastSource != serverNum){
-                            //send ack since all replies recieved
-                            sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
-                            System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
-                        }
                     }
-                } while (records[serverNum][1] != 0);
-            }
+                } else if (msg.equals(ackMsg)) {
+                    records[broadcastSource][1] -= 1;
+                    if (records[broadcastSource][1] == 0 && broadcastSource != serverNum) {
+                        //send ack since all replies recieved
+                        sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
+                        System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
+                    }
+                }
+            } while (!finished);
+
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
