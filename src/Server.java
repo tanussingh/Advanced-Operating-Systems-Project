@@ -14,6 +14,22 @@ public class Server extends Thread {
         t.start();
     }
 
+    public void sendPacket(Socket outSocket, ObjectOutputStream out, int broadcast, int source, String message, int dest) {
+        try {
+            Packet packet = new Packet();
+            packet.buildPacket(broadcast, source, message);
+            System.out.println("Packet to be sent: " + packet + ", to: " + dest);
+            outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
+            out = new ObjectOutputStream(outSocket.getOutputStream());
+            out.writeObject(packet);
+            out.flush();
+            out.close();
+            outSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void run() {
         //initialize socket and input/output stream
         ServerSocket server = null;
@@ -30,17 +46,11 @@ public class Server extends Thread {
         //set up variables
         int serverPort = this.array_of_nodes[serverNum].getPortNumber();
         String serverHostname = this.array_of_nodes[serverNum].getHostName();
-        int expectedReplies = 0;
         int parent = -1;
-        //int[][] records = new int[array_of_nodes.length - 1][2];
-        /*
-        source
-        node
-        waiting
-         */
+        int[][] records = new int[array_of_nodes.length][2];// index:source 0:node 1:waiting
 
         //starts server and waits for a connection
-        //this block of try is fro tree building
+        //this block of try is for tree building
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
@@ -53,16 +63,8 @@ public class Server extends Thread {
                 //send to all children ie neighbours
                 for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
                     int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
-                    packet = new Packet();
-                    packet.buildPacket(serverNum, reqMsg);
-                    System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                    outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                    out = new ObjectOutputStream(outSocket.getOutputStream());
-                    out.writeObject(packet);
-                    out.flush();
-                    out.close();
-                    outSocket.close();
-                    expectedReplies += 1;
+                    sendPacket(outSocket, out, serverNum, serverNum, reqMsg, dest);
+                    records[serverNum][1] += 1;
                 }
             }
 
@@ -77,7 +79,8 @@ public class Server extends Thread {
                 in.close();
 
                 //get info out of msg
-                int dest = packet.getSourceId();
+                int broadcastSource = packet.getBroadcastNode();
+                int source = packet.getSourceId();
                 String msg = packet.getMsg();
 
                 //if it is a request message
@@ -85,157 +88,122 @@ public class Server extends Thread {
                     if (!(array_of_nodes[serverNum].getDiscovered())) {
                         //if this server is not already discovered, set myself to discovered and remember parent
                         array_of_nodes[serverNum].setDiscovered(true);
-                        parent = dest;
+                        parent = source;
+                        records[broadcastSource][0] = source;
                         System.out.println("Discovered Set!, Parent Set for server: " + serverNum);
 
-                        //send out req to my neighbours
-                        for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
-                            dest = array_of_nodes[serverNum].getNodalConnections().get(i);
-                            if (dest != parent) {
-                                packet = new Packet();
-                                packet.buildPacket(serverNum, reqMsg);
-                                System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                                outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                                out = new ObjectOutputStream(outSocket.getOutputStream());
-                                out.writeObject(packet);
-                                out.flush();
-                                out.close();
-                                outSocket.close();
-                                expectedReplies += 1;
+                        if (array_of_nodes[serverNum].getNodalConnections().size() == 1) {
+                            //send ack back to parent because neighbour only 1
+                            sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
+                            System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
+                        } else {
+                            //send out req to all neighbours
+                            for (int i = 0; i < array_of_nodes[serverNum].getNodalConnections().size(); i++) {
+                                int dest = array_of_nodes[serverNum].getNodalConnections().get(i);
+                                if (dest != parent) {
+                                    sendPacket(outSocket, out, broadcastSource, serverNum, reqMsg, dest);
+                                    records[broadcastSource][1] += 1;
+                                }
                             }
                         }
                     } else if (array_of_nodes[serverNum].getDiscovered()) {
                         //if this server is already discovered, send nack
-                        packet = new Packet();
-                        packet.buildPacket(serverNum, nackMsg);
-                        outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                        out = new ObjectOutputStream(outSocket.getOutputStream());
-                        out.writeObject(packet);
-                        out.flush();
-                        out.close();
-                        outSocket.close();
-                        System.out.println("Send NACK to: " + dest + ". For server: " + serverNum);
+                        sendPacket(outSocket, out, broadcastSource, serverNum, nackMsg, source);
+                        System.out.println("Send NACK to: " + source + ". For server: " + serverNum);
                     }
                 } else if (!msg.equals(reqMsg)) {
                     //if it is a ack or nack message
-                    expectedReplies -= 1;
+                    records[broadcastSource][1] -= 1;
                     if (msg.equals(ackMsg)) {
                         //if message is ack, add message source to child list
-                        array_of_nodes[serverNum].addTreeNeighbours(dest);
-                        System.out.println("Received ACK from: " + dest + ". For server: " + serverNum);
-                        System.out.println("New child: " + dest + ", added to: " + serverNum);
+                        array_of_nodes[serverNum].addTreeNeighbours(source);
+                        System.out.println("Received ACK from: " + source + ". For server: " + serverNum);
+                        System.out.println("New child: " + source + ", added to: " + serverNum);
                     } else if (msg.equals(nackMsg)) {
                         //if message is nack, do nothing with it
-                        System.out.println("Received NACK from: " + dest + ". For server: " + serverNum);
+                        System.out.println("Received NACK from: " + source + ". For server: " + serverNum);
+                    }
+                    if (records[broadcastSource][1] == 0 && broadcastSource != serverNum) {
+                        //send ack back to parent since all replies recieved
+                        sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
+                        System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
                     }
                 }
-            } while (expectedReplies != 0);
-
-            //send ack back to parent
-            packet = new Packet();
-            packet.buildPacket(serverNum, ackMsg);
-            outSocket = new Socket(array_of_nodes[parent].getHostName(), array_of_nodes[parent].getPortNumber());
-            out = new ObjectOutputStream(outSocket.getOutputStream());
-            out.writeObject(packet);
-            out.flush();
-            out.close();
-            outSocket.close();
-            System.out.println("Send ACK to parent: " + parent + ". For server: " + serverNum);
+            } while (records[1][1] != 0);
 
             //close all ports and servers so it can start new in another try block for broadcasting
             inSocket.close();
             server.close();
+
+            //print tree neighbours
+            if (parent != serverNum){
+                array_of_nodes[serverNum].addTreeNeighbours(parent);
+            }
+            System.out.println("Server = " + serverNum + ", Tree Neighbours = " + array_of_nodes[serverNum].getTreeNeighbours());
+            System.out.println("--------------------------------------SPANNING TREE DONE--------------------------------------");
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-
-        //print tree neighbours
-        if (parent != serverNum){
-            array_of_nodes[serverNum].addTreeNeighbours(parent);
-        }
-        System.out.println("Server = " + serverNum + ", Tree Neighbours = " + array_of_nodes[serverNum].getTreeNeighbours());
-        System.out.println("--------------------------------------SPANNING TREE DONE--------------------------------------");
 
         //broadcast to every node
-        //int messagesToSend = 5;
-        /*try {
+        int messagesToSend = 5;
+        try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
             Thread.sleep(3000);
 
             Packet packet;
+            //sends messagesToSend messages
             for (int j = 0; j < messagesToSend; j++) {
+                //sends to all tree neighbours
                 for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
                     int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                    packet = new Packet();
-                    packet.buildPacket(serverNum, "Hello");
-                    packet.setBroadcastNode(serverNum);
-                    System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                    outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                    out = new ObjectOutputStream(outSocket.getOutputStream());
-                    out.writeObject(packet);
-                    out.flush();
-                    out.close();
-                    outSocket.close();
+                    sendPacket(outSocket, out, serverNum, serverNum, "Hello", dest);
+                    records[serverNum][1] += 1;
                 }
 
-                while ()
+                do {
+                    System.out.println("Server: Waiting for a messages ...");
+                    inSocket = server.accept();
+                    System.out.println("Server: Packet received!");
+                    in = new ObjectInputStream(inSocket.getInputStream());
+                    packet = (Packet) in.readObject();
+                    System.out.println("Server: Packet Received - " + packet);
+                    in.close();
 
+                    //get info out of msg
+                    int broadcastSource = packet.getBroadcastNode();
+                    int source = packet.getSourceId();
+                    String msg = packet.getMsg();
+
+                    //if record at broadcastSource == 0 then it means its a new message
+                    if (!msg.equals(ackMsg)) {
+                        records[broadcastSource][0] = source;
+                        if (array_of_nodes[serverNum].getTreeNeighbours().size() == 1) {
+                            //send ack back to source if neighbour list is 1
+                            sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, source);
+                        } else {
+                            //continue broadcast message
+                            for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
+                                int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
+                                if (dest != source) {
+                                    sendPacket(outSocket, out, broadcastSource, serverNum, msg, dest);
+                                    records[broadcastSource][1] += 1;
+                                }
+                            }
+                        }
+                    } else if (msg.equals(ackMsg)) {
+                        records[broadcastSource][1] -= 1;
+                        if (records[broadcastSource][1] == 0 && broadcastSource != serverNum){
+                            //send ack since all replies recieved
+                            sendPacket(outSocket, out, broadcastSource, serverNum, ackMsg, records[broadcastSource][0]);
+                            System.out.println("Send ACK to parent: " + records[broadcastSource][0] + ". For server: " + serverNum);
+                        }
+                    }
+                } while (records[serverNum][1] != 0);
             }
         } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        //delete try block
-        try {
-            boolean finished = false;
-            server = new ServerSocket(serverPort);
-            System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
-            Thread.sleep(3000);
-
-            Packet packet;
-            for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                packet = new Packet();
-                packet.buildPacket(serverNum, "Hello");
-                System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                out = new ObjectOutputStream(outSocket.getOutputStream());
-                out.writeObject(packet);
-                out.flush();
-                out.close();
-                outSocket.close();
-            }
-
-            while (!finished) {
-                System.out.println("Server: Waiting for a messages ...");
-                inSocket = server.accept();
-                System.out.println("Server: Packet received!");
-                in = new ObjectInputStream(inSocket.getInputStream());
-                packet = (Packet) in.readObject();
-                System.out.println("Server: Packet Received - " + packet);
-                in.close();
-
-                //get info out of msg
-                String msg = packet.getMsg();
-
-                //send out message to my children
-                for (int i = 0; i < array_of_nodes[serverNum].getTreeNeighbours().size(); i++) {
-                    int dest = array_of_nodes[serverNum].getTreeNeighbours().get(i);
-                    if (dest != parent) {
-                        packet = new Packet();
-                        packet.buildPacket(serverNum, msg);
-                        System.out.println("Packet to be sent: " + packet + ", to: " + dest);
-                        outSocket = new Socket(array_of_nodes[dest].getHostName(), array_of_nodes[dest].getPortNumber());
-                        out = new ObjectOutputStream(outSocket.getOutputStream());
-                        out.writeObject(packet);
-                        out.flush();
-                        out.close();
-                        outSocket.close();
-                    }
-                }
-            }
-        } catch (IOException | InterruptedException | ClassNotFoundException e) {
-            e.printStackTrace();
-        }*/
     }
 }

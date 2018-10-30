@@ -5,13 +5,10 @@ public class Packet implements Serializable {
     private int sourceId;
     private String msg;
 
-    public void buildPacket(int sourceId, String msg) {
+    public void buildPacket(int broadcast, int sourceId, String msg) {
+        this.broadcastNode = broadcast;
         this.sourceId = sourceId;
         this.msg = msg;
-    }
-
-    public void setBroadcastNode(int num) {
-        this.broadcastNode = num;
     }
 
     public int getBroadcastNode() {
@@ -28,6 +25,6 @@ public class Packet implements Serializable {
 
     @Override
     public String toString() {
-        return "Message [sourceId=" + sourceId + ", msg=" + this.msg + "]";
+        return "Message [broadcastNode=" + this.broadcastNode + ", sourceId=" + this.sourceId + ", msg=" + this.msg + "]";
     }
 }
