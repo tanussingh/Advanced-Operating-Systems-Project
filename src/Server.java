@@ -57,7 +57,7 @@ public class Server extends Thread {
             //ONLY SERVER 1 RUNS THIS IF BLOCK OF CODE
             Packet packet;
             if (serverNum == 1) {
-                Thread.sleep(3000);
+                Thread.sleep(10000);
                 array_of_nodes[serverNum].setDiscovered(true);
                 parent = serverNum;
                 //send to all children ie neighbours
@@ -146,11 +146,11 @@ public class Server extends Thread {
         }
 
         //broadcast to every node
-        int messagesToSend = 100;
+        int messagesToSend = 5;
         try {
             server = new ServerSocket(serverPort);
             System.out.println("Started at Host: " + serverHostname + " Port: " + serverPort);
-            Thread.sleep(3000);
+            Thread.sleep(8000);
             boolean finished = false;
             int counter = 1;
 
